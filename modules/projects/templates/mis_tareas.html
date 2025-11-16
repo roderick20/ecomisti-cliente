@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Tareas - To-Do App{% endblock %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">
+        <i class="fas fa-user-tasks me-2"></i>Mis Tareas Asignadas
+    </h1>
+    <div class="d-flex align-items-center">
+        <span class="badge bg-primary fs-6 me-3">{{ tareas_abiertas|length }} tarea{{ 's' if tareas_abiertas|length != 1 else '' }}</span>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-calendario">Calendario</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-lista">Lista</button>
+            
+        </div>
+    </div>
+</div>
+
+{% if not tareas %}
+    <div class="text-center py-5">
+        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No tienes tareas asignadas</h4>
+        <p class="text-muted">Cuando te asignen tareas aparecerán aquí</p>
+        <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-1"></i>Volver al Dashboard
+        </a>
+    </div>
+{% else %}
+    <!-- Filtros (solo visible en vista lista) -->
+    <div class="card mb-4 filtros-container">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="estado-filter" id="todas" value="todas">
+                        <label class="btn btn-outline-secondary btn-sm" for="todas">Todas</label>
+
+                        <input type="radio" class="btn-check" name="estado-filter" id="abiertas" value="abierta" checked>
+                        <label class="btn btn-outline-success btn-sm" for="abiertas">Abiertas</label>
+
+                        <input type="radio" class="btn-check" name="estado-filter" id="cerradas" value="cerrada">
+                        <label class="btn btn-outline-secondary btn-sm" for="cerradas">Cerradas</label>
+
+                        <input type="radio" class="btn-check" name="estado-filter" id="canceladas" value="cancelada">
+                        <label class="btn btn-outline-danger btn-sm" for="canceladas">Canceladas</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="prioridad-filter" id="todas-prioridad" value="todas" checked>
+                        <label class="btn btn-outline-secondary btn-sm" for="todas-prioridad">Todas</label>
+
+                        <input type="radio" class="btn-check" name="prioridad-filter" id="urgentes" value="urgente">
+                        <label class="btn btn-outline-warning btn-sm" for="urgentes">Urgentes</label>
+
+                        <input type="radio" class="btn-check" name="prioridad-filter" id="normales" value="normal">
+                        <label class="btn btn-outline-info btn-sm" for="normales">Normales</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control form-control-sm" id="search" 
+                           placeholder="Buscar en título o descripción...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista Lista -->
+    <div id="tareas-container" class="row">
+        {% for tarea in tareas %}
+            <div class="col-lg-6 col-xl-4 mb-4 tarea-item" 
+                 data-estado="{{ tarea.estado }}" 
+                 data-prioridad="{{ tarea.prioridad }}"
+                 data-search="{{ tarea.titulo|lower }} {{ tarea.descripcion|lower if tarea.descripcion else '' }}">
+                <div class="card h-100 priority-{{ tarea.prioridad }} task-card">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h6 class="mb-0">{{ tarea.titulo }}</h6>
+                            <span class="badge bg-{{ 'warning' if tarea.prioridad == 'urgente' else 'info' }}">
+                                {{ tarea.prioridad|title }}
+                            </span>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-folder me-1"></i>{{ tarea.proyecto_nombre }} 
+                            <i class="fas fa-chevron-right mx-1"></i>
+                            <i class="fas fa-running me-1"></i>{{ tarea.sprint_nombre }}
+                        </small>
+                    </div>
+                    <div class="card-body">
+                        {% if tarea.descripcion %}
+                            <p class="card-text text-muted small mb-3">
+                                {{ tarea.descripcion[:150] }}{% if tarea.descripcion|length > 150 %}...{% endif %}
+                            </p>
+                        {% else %}
+                            <p class="card-text text-muted fst-italic small mb-3">Sin descripción</p>
+                        {% endif %}
+                        
+                        <div class="mb-2">
+                            <span class="badge bg-{{ 'success' if tarea.estado == 'abierta' else ('danger' if tarea.estado == 'cancelada' else 'secondary') }}">
+                                <i class="fas fa-{{ 'circle' if tarea.estado == 'abierta' else ('times-circle' if tarea.estado == 'cancelada' else 'check-circle') }} me-1"></i>
+                                {{ tarea.estado|title }}
+                            </span>
+                            {% if tarea.archivo_adjunto %}
+                                <i class="fas fa-paperclip ms-2 text-muted" title="Tiene archivo adjunto"></i>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="text-muted small">
+                            <div><i class="fas fa-calendar me-1"></i>{{ tarea.fecha_termino.strftime('%d/%m/%Y') }}</div>
+                            {% if tarea.creado_por_nombre %}
+                                <div><i class="fas fa-user-edit me-1"></i>Creada por: {{ tarea.creado_por_nombre }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <div class="btn-group w-100" role="group">
+                            <a href="{{ url_for('task.ver_tarea', tarea_id=tarea.id) }}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if tarea.estado == 'abierta' %}
+                                <a href="{{ url_for('task.cambiar_estado_tarea', tarea_id=tarea.id, nuevo_estado='cerrada', proyecto_id = tarea.proyecto_id ) }}" 
+                                   class="btn btn-outline-success btn-sm" title="Marcar como cerrada">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a href="{{ url_for('task.cambiar_estado_tarea', tarea_id=tarea.id, nuevo_estado='cancelada', proyecto_id = tarea.proyecto_id) }}" 
+                                   class="btn btn-outline-danger btn-sm" title="Cancelar"
+                                   onclick="return confirm('¿Estás seguro de cancelar esta tarea?')">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            {% elif tarea.estado == 'cerrada' %}
+                                <a href="{{ url_for('task.cambiar_estado_tarea', tarea_id=tarea.id, nuevo_estado='abierta', proyecto_id = tarea.proyecto_id) }}" 
+                                   class="btn btn-outline-warning btn-sm" title="Reabrir">
+                                    <i class="fas fa-undo"></i>
+                                </a>
+                            {% elif tarea.estado == 'cancelada' %}
+                                <a href="{{ url_for('task.cambiar_estado_tarea', tarea_id=tarea.id, nuevo_estado='abierta', proyecto_id = tarea.proyecto_id) }}" 
+                                   class="btn btn-outline-warning btn-sm" title="Reabrir">
+                                    <i class="fas fa-undo"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Vista Calendario Semanal (oculta por defecto) -->
+    <div id="calendario-semanal" class="d-none">
+        <div class="card mb-4">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <button class="btn btn-outline-secondary btn-sm" id="prev-semana">
+                    <i class="fas fa-chevron-left"></i> Semana Anterior
+                </button>
+                <h5 class="mb-0" id="titulo-semana">Semana del 01/01/2024 al 07/01/2024</h5>
+                <button class="btn btn-outline-secondary btn-sm" id="next-semana">
+                    Semana Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-3" id="dias-calendario">
+            <!-- Los días se generarán dinámicamente con JS -->
+        </div>
+    </div>
+{% endif %}
+
+<script>
+
+const tareasDia2 = {{ tareas|tojson|safe }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btnLista = document.getElementById('btn-lista');
+    const btnCalendario = document.getElementById('btn-calendario');
+    const listaTareas = document.getElementById('tareas-container');
+    const calendarioSemanal = document.getElementById('calendario-semanal');
+    const diasCalendario = document.getElementById('dias-calendario');
+    const tituloSemana = document.getElementById('titulo-semana');
+    const prevSemanaBtn = document.getElementById('prev-semana');
+    const nextSemanaBtn = document.getElementById('next-semana');
+    const filtrosContainer = document.querySelector('.filtros-container');
+
+    // Fecha inicial: semana actual
+    let fechaActual = new Date();
+
+    // Función para cambiar entre vistas
+    function toggleVista(vista) {
+        if (vista === 'lista') {
+            listaTareas.classList.remove('d-none');
+            calendarioSemanal.classList.add('d-none');
+            filtrosContainer.classList.remove('d-none');
+            btnLista.classList.add('active');
+            btnCalendario.classList.remove('active');
+        } else {
+            listaTareas.classList.add('d-none');
+            calendarioSemanal.classList.remove('d-none');
+            filtrosContainer.classList.add('d-none');
+            btnLista.classList.remove('active');
+            btnCalendario.classList.add('active');
+            renderizarCalendarioSemana(fechaActual);
+        }
+    }
+
+    btnLista.addEventListener('click', () => toggleVista('lista'));
+    btnCalendario.addEventListener('click', () => toggleVista('calendario'));
+
+    // Iniciar en vista lista
+    toggleVista('calendario');
+
+    // ==================== CALENDARIO SEMANAL ====================
+
+    function getStartOfWeek(date) {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Lunes como primer día
+        return new Date(date.setDate(diff));
+    }
+
+    function formatDate(date) {
+        return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function renderizarCalendarioSemana(fechaReferencia) {
+        const inicioSemana = getStartOfWeek(new Date(fechaReferencia));
+        const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        let html = '';
+
+        // Actualizar título de la semana
+        const finSemana = new Date(inicioSemana);
+        finSemana.setDate(inicioSemana.getDate() + 6);
+        tituloSemana.textContent = `Semana del ${formatDate(inicioSemana)} al ${formatDate(finSemana)}`;
+
+        // Generar cada día
+        for (let i = 0; i < 7; i++) {
+            const dia = new Date(inicioSemana);
+            dia.setDate(inicioSemana.getDate() + i);
+            const diaStr = dia.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+
+            // Filtrar tareas para este día
+            const tareasDia = {{ tareas|tojson|safe }}.filter(t => {
+                // Asumiendo que fecha_termino es string en formato ISO (ej: "2024-06-15")
+
+                const fechaObj = new Date(t.fecha_termino);
+                fechaObj.setDate(fechaObj.getDate());
+                console.log(fechaObj);
+
+                const fechaTarea = fechaObj.toISOString().split('T')[0];
+                return fechaTarea === diaStr && t.estado === 'abierta';
+            });
+
+            console.log(tareasDia);
+
+            html += `
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-header border  text-center">
+                            <strong>${diasSemana[i]}</strong><br>
+                            <small>${formatDate(dia)}</small>
+                        </div>
+                        <div class="card-body p-2">
+                            ${tareasDia.length === 0 ? 
+                                '<p class="text-muted text-center small mt-3">Sin tareas</p>' : 
+                                tareasDia.map(t => `
+                                    <div class="card mb-2 priority-${t.prioridad} task-card-calendar border">
+                                        <div class="card-body p-2">
+                                            <div >
+                                                <h6 class="mb-1 fs-6">${t.titulo}</h6>
+                                          
+                                                <h6 class="mb-1" style="font-size: .7rem;"><i>${t.proyecto_nombre}</i></h6>
+                                                <span class="badge bg-${t.prioridad === 'urgente' ? 'warning' : 'info'}" style="display:none;">${t.prioridad}</span>
+                                            </div>
+                                            <div class="mb-1" style="display:none;">
+                                                <span class="badge bg-${t.estado === 'abierta' ? 'success' : (t.estado === 'cancelada' ? 'danger' : 'secondary')}">
+                                                    <i class="fas fa-${t.estado === 'abierta' ? 'circle' : (t.estado === 'cancelada' ? 'times-circle' : 'check-circle')} me-1"></i>
+                                                    ${t.estado}
+                                                </span>
+
+
+                                                
+                                            </div>
+                                            <div class="mb-1">
+                                               
+
+                                                <a href="http://localhost:5000/tarea/${t.id}/estado/cerrada/4" 
+                                                class="btn btn-outline-success btn-sm" title="Marcar como cerrada">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+
+
+                                                <a href="http://localhost:5000/tarea/${t.id}/estado/cancelada/4" 
+                                                class="btn btn-outline-danger btn-sm" title="Cancelar"
+                                                onclick="return confirm('¿Estás seguro de cancelar esta tarea?')">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+
+                                                
+                                                 <a href="/tarea/${t.id}" 
+                                                    class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        diasCalendario.innerHTML = html;
+    }
+
+    // Navegación de semanas
+    prevSemanaBtn.addEventListener('click', () => {
+        fechaActual.setDate(fechaActual.getDate() - 7);
+        renderizarCalendarioSemana(fechaActual);
+    });
+
+    nextSemanaBtn.addEventListener('click', () => {
+        fechaActual.setDate(fechaActual.getDate() + 7);
+        renderizarCalendarioSemana(fechaActual);
+    });
+
+    // ==================== FILTROS DE LISTA ====================
+
+    const estadoFilters = document.querySelectorAll('input[name="estado-filter"]');
+    const prioridadFilters = document.querySelectorAll('input[name="prioridad-filter"]');
+    const searchInput = document.getElementById('search');
+
+    function filterTareas() {
+        const selectedEstado = document.querySelector('input[name="estado-filter"]:checked').value;
+        const selectedPrioridad = document.querySelector('input[name="prioridad-filter"]').value;//:checked
+        const searchTerm = searchInput.value.toLowerCase();
+
+        const tareas = document.querySelectorAll('.tarea-item');
+        let visibleCount = 0;
+
+        tareas.forEach(tarea => {
+            const estado = tarea.dataset.estado;
+            const prioridad = tarea.dataset.prioridad;
+            const searchData = tarea.dataset.search;
+
+            const matchesEstado = selectedEstado === 'todas' || estado === selectedEstado;
+            const matchesPrioridad = selectedPrioridad === 'todas' || prioridad === selectedPrioridad;
+            const matchesSearch = searchTerm === '' || searchData.includes(searchTerm);
+
+            if (matchesEstado && matchesPrioridad && matchesSearch) {
+                tarea.style.display = '';
+                visibleCount++;
+            } else {
+                tarea.style.display = 'none';
+            }
+        });
+
+        // Mostrar mensaje si no hay resultados
+        const noResults = document.getElementById('no-results');
+        if (noResults) noResults.remove();
+
+        if (visibleCount === 0 && tareas.length > 0) {
+            const noResultsDiv = document.createElement('div');
+            noResultsDiv.id = 'no-results';
+            noResultsDiv.className = 'col-12 text-center py-5';
+            noResultsDiv.innerHTML = `
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No se encontraron tareas</h5>
+                <p class="text-muted">Intenta ajustar los filtros de búsqueda</p>
+            `;
+            listaTareas.appendChild(noResultsDiv);
+        }
+    }
+
+    estadoFilters.forEach(filter => {
+        filter.addEventListener('change', filterTareas);
+    });
+
+    prioridadFilters.forEach(filter => {
+        filter.addEventListener('change', filterTareas);
+    });
+
+    searchInput.addEventListener('input', filterTareas);
+
+    // Aplicar filtros iniciales
+    filterTareas();
+});
+</script>
+{% endblock %}

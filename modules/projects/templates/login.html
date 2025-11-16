@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - To-Do App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .login-card {
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-floating input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .welcome-text {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body class="d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else ('warning' if category == 'warning' else 'success') }} alert-dismissible fade hide"
+                    role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <div class="card login-card border-0">
+                    <div class="card-header login-header text-white text-center py-4">
+                        <h2 class="mb-2">
+                            <i class="fas fa-tasks me-2"></i>To-Do Manager
+                        </h2>
+                        <p class="mb-0 opacity-90">Gestiona tus proyectos y tareas</p>
+                    </div>
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h4 class="text-primary mb-2">Iniciar Sesión</h4>
+                            <p class="welcome-text">Ingresa tus credenciales para acceder</p>
+                        </div>
+
+                        <form method="POST">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="username" name="username"
+                                    placeholder="Usuario" required>
+                                <label for="username">
+                                    <i class="fas fa-user me-2"></i>Usuario
+                                </label>
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control" id="password" name="password"
+                                    placeholder="Contraseña" required>
+                                <label for="password">
+                                    <i class="fas fa-lock me-2"></i>Contraseña
+                                </label>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                                </button>
+                            </div>
+                        </form>
+
+
+
+
+                    </div>
+                    <div class="card-footer bg-light text-center py-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            AgileX-2025
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

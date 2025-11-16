@@ -1,0 +1,87 @@
+<!-- templates/personerias/listar.html -->
+{% extends "base.html" %} {% block title %}personerias{% endblock %} {% block content %}
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3><i class="fas fa-box"></i> Clientes</h3>
+    </div>
+    <div class="col-auto ms-auto text-end mt-n1">
+        <a class="btn btn-primary" href="{{ url_for('facturacion.personeria_create') }}"><i class="fas fa-plus"></i> Agregar</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="tblList" class="table mb-0 table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <td>Razón Social</td>
+                                <td>Tipo</td>
+                                <td>Número</td>
+                                <td>Dirección</td>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if list %} {% for item in list %}
+                            <tr>
+                                <td>{{ item.razon_social }}</td>
+                                <td>{% if item.tipo_doc == '1' %} DNI {% elif item.tipo_doc == '6' %} RUC {% elif item.tipo_doc == '4' %} CARNET DE EXTRANJERIA {% elif item.tipo_doc == '7' %} PASAPORTE {% endif %}</td>
+                                <td>{{ item.numero_doc }}</td>
+                                <td>{{ item.direccion }}</td>
+                                <td style="width: 1%" nowrap>
+                                    <!-- <a href="{{ url_for('facturacion.personeria_update', uniqueid=item.uniqueid) }}" class="btn btn-sm btn-info"><i class="fa-solid fa-pen-to-square"></i> Editar</a> -->
+
+                                    <form id="form-delete-{{ item.uniqueid }}" action="{{ url_for('facturacion.personeria_delete', uniqueid=item.uniqueid) }}" method="POST" style="display: inline">
+                                        <button type="submit" class="btn btn-sm btn-danger" data-id="{{ item.uniqueid }}"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %} {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block scripts %}
+
+<link href="https://cdn.datatables.net/v/bs5/dt-2.3.4/datatables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/v/bs5/dt-2.3.4/datatables.min.js"></script>
+
+<script>
+    let table = new DataTable("#tblList", {
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/es-ES.json",
+        },
+    });
+
+    document.querySelectorAll(".btn-danger").forEach((button) => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault(); // Evita el envío inmediato
+
+            const form = this.closest("form");
+
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "¡No podrás revertir esta acción!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Envía el formulario si confirma
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

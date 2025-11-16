@@ -1,0 +1,113 @@
+<!-- templates/productos/form.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ "Editar" if producto else "Nuevo" }} Producto{% endblock %}
+
+{% block content %}
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3>Agregar Tarea</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" id="form-create">
+
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label for="fecha_inicio" class="form-label">Fecha Inicio <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                        </div>
+
+                        <div class="col-6 mb-3">
+                            <label for="fecha_fin" class="form-label">Fecha Fin <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                        </div>
+                    </div>
+
+
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción <span
+                                class="text-danger">*</span></label>
+                        <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
+                    </div>
+
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end" id="cancel-btn">
+                        <a href="{{ url_for('task.task_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            </span><i class="fas fa-save"></i> Grabar
+                        </button>
+                        <button type="submit" class="btn btn-primary d-none" id="submit-spin-btn" disabled>
+                            <i class="fas fa-save"></i> Grabar <i class="spinner-border spinner-border-sm"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<link href="/static/datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+<script src="/static/datepicker/js/bootstrap-datepicker.min.js"></script>
+<script src="/static/datepicker/locales/bootstrap-datepicker.es.min.js"></script>
+<script>
+
+    // Establecer la fecha actual en el campo
+    const hoy = new Date().toISOString().split('T')[0]; // Formato: "yyyy-mm-dd"
+    document.getElementById('fecha_inicio').value = hoy;
+
+    $('#fecha_inicio').datepicker({
+        format: "yyyy-mm-dd",
+        language: "es",
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $('#fecha_fin').datepicker({
+        format: "yyyy-mm-dd",
+        language: "es",
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    // document.getElementById('submit-btn').addEventListener('click', function () {
+    //     const text = document.getElementById('btn-text');
+    //     const spinner = document.getElementById('btn-spinner');
+
+    //     // Ocultar texto y mostrar spinner
+    //     text.classList.add('d-none');
+    //     spinner.classList.remove('d-none');
+
+    //     // Opcional: deshabilitar el botón para evitar múltiples envíos
+    //     //this.disabled = true;
+    // });
+    document.getElementById('form-create').addEventListener('submit', function (e) {
+        if (!this.checkValidity()) {
+            return;
+        }
+
+        const cancel_btn = document.getElementById('cancel-btn');
+        cancel_btn.disabled = true;
+
+        const btn = document.getElementById('submit-btn');
+        btn.classList.add('d-none');
+
+        const btn_spin = document.getElementById('submit-spin-btn');
+        btn_spin.classList.remove('d-none');
+    });
+</script>
+{% endblock %}

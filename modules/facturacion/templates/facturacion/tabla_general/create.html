@@ -1,0 +1,65 @@
+<!-- templates/categorias/listar.html -->
+{% extends "base.html" %}
+
+{% block title %}Categorías{% endblock %}
+
+
+
+{% block content %}
+
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3>Agregar Producto-Grupo</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <p>
+                        <label>Nombre:</label><br>
+                        <input class="form-control" type="text" name="nombre" required>
+                    </p>
+                    <p>
+                        <label>Grupo Padre (ID, opcional):</label><br>
+                        <select class="form-select" id="parent_id" name="parent_id">
+                            <option value="">Sin asignar</option>
+                            {% for grupo in tabla_general_parent %}
+                            <option value="{{ grupo.uniqueid }}">{{ grupo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </p>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('facturacion.tabla_general_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Regresar
+                        </a>
+
+                        <button type="submit" class="btn btn-primary" id="btn-submit">
+                            <i class="fas fa-save"></i> Grabar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const submitBtn = document.getElementById('btn-submit');
+
+        if (form && submitBtn) {
+            form.addEventListener('submit', function () {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                submitBtn.disabled = true; 
+            });
+        }
+    });
+</script>
+{% endblock %}

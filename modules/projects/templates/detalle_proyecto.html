@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - To-Do App{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4" style="display: none;">
+    <h1 class="h3" style="display: none;">
+        <i class="fas fa-project-diagram me-2"></i>Dashboard de Proyectos
+    </h1>
+    <a href="{{ url_for('project.nuevo_proyecto') }}" class="btn btn-primary" style="display: none;">
+        <i class="fas fa-plus me-1"></i>Nuevo Proyecto
+    </a>
+</div>
+
+{% if not proyectos %}
+<div class="text-center py-5">
+    <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+    <h4 class="text-muted">No hay proyectos aún</h4>
+    <p class="text-muted">Comienza creando tu primer proyecto</p>
+    <a href="{{ url_for('project.nuevo_proyecto') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Crear Proyecto
+    </a>
+</div>
+{% else %}
+{% for proyecto_id, proyecto in proyectos.items() %}
+<div class="card card-proyecto">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-folder me-2"></i>{{ proyecto.nombre }}
+                <span class="badge bg-{{ 'success' if proyecto.estado == 'abierto' else 'secondary' }} ms-2">
+                    {{ proyecto.estado|title }}
+                </span>
+            </h4>
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('project.toggle_proyecto_estado', proyecto_id=proyecto.id) }}"
+                    class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-{{ 'lock' if proyecto.estado == 'abierto' else 'unlock' }} me-1"></i>
+                    {{ 'Cerrar' if proyecto.estado == 'abierto' else 'Abrir' }}
+                </a>
+                {% if proyecto.estado == 'abierto' %}
+                <a href="{{ url_for('sprint.nuevo_sprint', proyecto_id=proyecto.id) }}"
+                    class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-plus me-1"></i>Nuevo Sprint
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% if proyecto.estado == 'abierto' %}
+    <div class="card-body">
+        {% if not proyecto.sprints %}
+        <div class="text-center py-4">
+            <i class="fas fa-running text-muted fa-2x mb-2"></i>
+            <p class="text-muted mb-3">No hay sprints en este proyecto</p>
+            <a href="{{ url_for('sprint.nuevo_sprint', proyecto_id=proyecto.id) }}"
+                class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-plus me-1"></i>Crear Sprint
+            </a>
+        </div>
+        {% else %}
+        {% for sprint_id, sprint in proyecto.sprints.items() %}
+        <div class="card card-sprint mb-3">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-running me-2"></i>{{ sprint.nombre }}
+                        <span class="badge bg-{{ 'info' if sprint.estado == 'abierto' else 'secondary' }} ms-2">
+                            {{ sprint.estado|title }}
+                        </span>
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('sprint.toggle_sprint_estado', sprint_id=sprint.id, proyecto_id= proyecto.id ) }}"
+                            class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-{{ 'pause' if sprint.estado == 'abierto' else 'play' }} me-1"></i>
+                            {{ 'Cerrar' if sprint.estado == 'abierto' else 'Abrir' }}
+                        </a>
+                        {% if sprint.estado == 'abierto' %}
+                        <a href="{{ url_for('task.nueva_tarea', sprint_id=sprint.id, proyecto_id= proyecto.id ) }}"
+                            class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-plus me-1"></i>Nueva Tarea
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if sprint.estado == 'abierto' %}
+            <div class="card-body">
+                {% if not sprint.tareas %}
+                <div class="text-center py-3">
+                    <i class="fas fa-tasks text-muted mb-2"></i>
+                    <p class="text-muted mb-2">No hay tareas en este sprint</p>
+                    <a href="{{ url_for('task.nueva_tarea', sprint_id=sprint.id, proyecto_id= proyecto.id ) }}"
+                        class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-plus me-1"></i>Crear Tarea
+                    </a>
+                </div>
+                {% else %}
+                <div class="row">
+                    {% for tarea in sprint.tareas %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card task-card h-100 priority-{{ tarea.prioridad }}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">{{ tarea.titulo }}</h6>
+                                    <span class="badge bg-{{ 'warning' if tarea.prioridad == 'urgente' else 'info' }}">
+                                        {{ tarea.prioridad|title }}
+                                    </span>
+                                </div>
+                                <p class="card-text text-muted small">
+                                    {{ tarea.descripcion[:100] if tarea.descripcion else 'Sin descripción' }}{% if
+                                    tarea.descripcion and tarea.descripcion|length > 100 %}...{% endif %}
+                                </p>
+
+                                <div class="mb-2">
+                                    <span
+                                        class="badge bg-{{ 'success' if tarea.estado == 'abierta' else ('danger' if tarea.estado == 'cancelada' else 'secondary') }}">
+                                        {{ tarea.estado|title }}
+                                    </span>
+                                    {% if tarea.archivo_adjunto %}
+                                    <i class="fas fa-paperclip ms-2 text-muted" title="Tiene archivo adjunto"></i>
+                                    {% endif %}
+                                </div>
+
+                                {% if tarea.asignado_nombre %}
+                                <div class="mb-2">
+                                    <small class="text-info">
+                                        <i class="fas fa-user me-1"></i>{{ tarea.asignado_nombre }}
+                                    </small>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ms-1"
+                                        data-bs-toggle="dropdown">
+                                        <i class="fas fa-user-edit"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <h6 class="dropdown-header">Reasignar a:</h6>
+                                        </li>
+                                        {% for usuario in usuarios %}
+                                        {% if usuario.id != tarea.asignado_id %}
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('task.asignar_tarea', tarea_id=tarea.id, usuario_id=usuario.id, proyecto_id= proyecto.id ) }}">
+                                                <i class="fas fa-user me-2"></i>{{ usuario.nombre }}
+                                            </a></li>
+                                        {% endif %}
+                                        {% endfor %}
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger"
+                                                href="{{ url_for('task.desasignar_tarea', tarea_id=tarea.id) }}">
+                                                <i class="fas fa-user-times me-2"></i>Desasignar
+                                            </a></li>
+                                    </ul>
+                                </div>
+                                {% else %}
+                                <div class="mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        <i class="fas fa-user-plus me-1"></i>Sin asignar
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <h6 class="dropdown-header">Asignar a:</h6>
+                                        </li>
+                                        {% for usuario in usuarios %}
+                                        <li><a class="dropdown-item"
+                                                href="{{ url_for('task.asignar_tarea', tarea_id=tarea.id, usuario_id=usuario.id) }}">
+                                                <i class="fas fa-user me-2"></i>{{ usuario.nombre }}
+                                            </a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>{{ tarea.fecha_termino.strftime('%d/%m/%Y') }}
+                                    {% if tarea.creado_por %}
+                                    <br><i class="fas fa-user-edit me-1"></i>{{ tarea.creado_por }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <div class="btn-group w-100" role="group">
+                                    <a href="{{ url_for('task.ver_tarea', tarea_id=tarea.id) }}"
+                                        class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('task.edit', task_id=tarea.id, project_id = proyecto.id ) }}"
+                                        class="btn btn-outline-primary btn-sm">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    {% if tarea.estado == 'abierta' %}
+                                    <a href="{{ url_for('task.cambiar_estado_tarea', tarea_id=tarea.id, nuevo_estado='cerrada', proyecto_id= proyecto.id) }}"
+                                        class="btn btn-outline-success btn-sm" title="Marcar como cerrada">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{{ url_for('task.cambiar_estado_tarea', tarea_id=tarea.id, nuevo_estado='cancelada', proyecto_id= proyecto.id) }}"
+                                        class="btn btn-outline-danger btn-sm" title="Cancelar">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    {% elif tarea.estado == 'cerrada' %}
+                                    <a href="{{ url_for('task.cambiar_estado_tarea', tarea_id=tarea.id, nuevo_estado='abierta', proyecto_id= proyecto.id) }}"
+                                        class="btn btn-outline-warning btn-sm" title="Reabrir">
+                                        <i class="fas fa-undo"></i>
+                                    </a>
+                                    {% elif tarea.estado == 'cancelada' %}
+                                    <a href="{{ url_for('task.cambiar_estado_tarea', tarea_id=tarea.id, nuevo_estado='abierta', proyecto_id= proyecto.id) }}"
+                                        class="btn btn-outline-warning btn-sm" title="Reabrir">
+                                        <i class="fas fa-undo"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

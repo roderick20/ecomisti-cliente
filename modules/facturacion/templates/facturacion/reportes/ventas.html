@@ -1,0 +1,203 @@
+
+<!-- templates/reportes/ventas.html -->
+{% extends "base.html" %}
+
+{% block title %}Reporte de Ventas{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-chart-line"></i> Reporte de Ventas</h2>
+        <p class="text-muted">Análisis detallado de ventas con filtros personalizables</p>
+    </div>
+    <button id="btn-exportar" class="btn btn-success">
+        <i class="fas fa-file-excel"></i> Exportar a Excel
+    </button>
+</div>
+
+<!-- Sección de Filtros -->
+<div class="filter-section">
+    <h5><i class="fas fa-filter"></i> Filtros</h5>
+    <form id="filtros-form">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
+            </div>
+            <div class="col-md-3">
+                <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
+            </div>
+            <div class="col-md-3">
+                <label for="estado" class="form-label">Estado</label>
+                <select class="form-control" id="estado" name="estado">
+                    <option value="">Todos los estados</option>
+                    <option value="borrador">Borrador</option>
+                    <option value="emitida">Emitida</option>
+                    <option value="pagada">Pagada</option>
+                    <option value="anulada">Anulada</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Tarjetas de Resumen -->
+<div class="row mb-4" id="resumen-cards" style="display: none;">
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <h3 id="total-ventas">$0.00</h3>
+                <p class="mb-0">Total Ventas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <h3 id="total-facturas">0</h3>
+                <p class="mb-0">Total Facturas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <h3 id="promedio-venta">$0.00</h3>
+                <p class="mb-0">Promedio por Venta</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Resultados -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-table"></i> Resultados</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="ventas-table" class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Estado</th>
+                        <th>Subtotal</th>
+                        <th>Descuento</th>
+                        <th>Impuestos</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Datos cargados vía AJAX -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Inicializar tabla
+    var table = $('#ventas-table').DataTable({
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
+        },
+        pageLength: 25,
+        order: [[1, 'desc']] // Ordenar por fecha descendente
+    });
+
+    // Formulario de filtros
+    $('#filtros-form').on('submit', function(e) {
+        e.preventDefault();
+        cargarDatos();
+    });
+
+    // Botón exportar
+    $('#btn-exportar').on('click', function() {
+        var params = $('#filtros-form').serialize();
+        window.location.href = "{{ url_for('reportes.exportar_ventas_excel') }}" + '?' + params;
+    });
+
+    function cargarDatos() {
+        var params = $('#filtros-form').serialize();
+        
+        $.get("{{ url_for('reportes.api_ventas_data') }}" + '?' + params)
+            .done(function(data) {
+                // Limpiar tabla
+                table.clear();
+                
+                // Agregar datos
+                data.facturas.forEach(function(factura) {
+                    var estadoBadge = {
+                        'borrador': '<span class="badge bg-secondary">Borrador</span>',
+                        'emitida': '<span class="badge bg-primary">Emitida</span>',
+                        'pagada': '<span class="badge bg-success">Pagada</span>',
+                        'anulada': '<span class="badge bg-danger">Anulada</span>'
+                    };
+                    
+                    table.row.add([
+                        factura.numero,
+                        new Date(factura.fecha).toLocaleDateString('es-ES'),
+                        factura.cliente_nombre,
+                        estadoBadge[factura.estado] || factura.estado,
+                        ' + parseFloat(factura.subtotal).toFixed(2),
+                        ' + parseFloat(factura.descuento).toFixed(2),
+                        ' + parseFloat(factura.impuestos).toFixed(2),
+                        ' + parseFloat(factura.total).toFixed(2)
+                    ]);
+                });
+                
+                table.draw();
+                
+                // Actualizar resumen
+                $('#total-ventas').text(' + data.resumen.total_ventas.toFixed(2));
+                $('#total-facturas').text(data.resumen.total_facturas);
+                $('#promedio-venta').text(' + data.resumen.promedio.toFixed(2));
+                $('#resumen-cards').show();
+            })
+            .fail(function() {
+                alert('Error al cargar los datos');
+            });
+    }
+    
+    // Cargar datos iniciales (último mes)
+    var hoy = new Date();
+    var inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    
+    $('#fecha_inicio').val(inicioMes.toISOString().split('T')[0]);
+    $('#fecha_fin').val(hoy.toISOString().split('T')[0]);
+    
+    cargarDatos();
+});
+</script>
+{% endblock %}
+

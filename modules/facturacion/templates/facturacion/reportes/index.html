@@ -1,0 +1,137 @@
+<!-- templates/reportes/index.html -->
+{% extends "base.html" %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1><i class="fas fa-chart-bar"></i> Reportes del Sistema</h1>
+        <p class="text-muted">Análisis y estadísticas de tu negocio</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-chart-line"></i> Reporte de Ventas</h5>
+            </div>
+            <div class="card-body">
+                <p>Analiza las ventas por período, cliente y estado. Incluye filtros avanzados y exportación a Excel.</p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Filtros por fecha</li>
+                    <li><i class="fas fa-check text-success"></i> Filtros por cliente</li>
+                    <li><i class="fas fa-check text-success"></i> Exportar a Excel</li>
+                    <li><i class="fas fa-check text-success"></i> Gráficos interactivos</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('reportes.ventas') }}" class="btn btn-primary w-100">
+                    <i class="fas fa-eye"></i> Ver Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-box"></i> Productos Más Vendidos</h5>
+            </div>
+            <div class="card-body">
+                <p>Identifica los productos con mejor desempeño de ventas y analiza su rendimiento.</p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Top productos</li>
+                    <li><i class="fas fa-check text-success"></i> Cantidad vendida</li>
+                    <li><i class="fas fa-check text-success"></i> Ingresos generados</li>
+                    <li><i class="fas fa-check text-success"></i> Exportar datos</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('reportes.productos_mas_vendidos') }}" class="btn btn-success w-100">
+                    <i class="fas fa-eye"></i> Ver Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-users"></i> Mejores Clientes</h5>
+            </div>
+            <div class="card-body">
+                <p>Conoce a tus clientes más importantes y analiza sus patrones de compra.</p>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Top clientes</li>
+                    <li><i class="fas fa-check text-success"></i> Valor total de compras</li>
+                    <li><i class="fas fa-check text-success"></i> Frecuencia de compra</li>
+                    <li><i class="fas fa-check text-success"></i> Última compra</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('reportes.clientes_top') }}" class="btn btn-info w-100">
+                    <i class="fas fa-eye"></i> Ver Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-download"></i> Exportaciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('reportes.exportar_ventas_excel') }}" class="btn btn-outline-success w-100 mb-2">
+                            <i class="fas fa-file-excel"></i><br>
+                            Ventas del Mes<br>
+                            <small>Excel</small>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('reportes.exportar_productos_excel') }}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="fas fa-file-excel"></i><br>
+                            Productos Top<br>
+                            <small>Excel</small>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-info w-100 mb-2" onclick="exportarInventario()">
+                            <i class="fas fa-file-excel"></i><br>
+                            Inventario<br>
+                            <small>Excel</small>
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-warning w-100 mb-2" onclick="exportarClientes()">
+                            <i class="fas fa-file-excel"></i><br>
+                            Lista Clientes<br>
+                            <small>Excel</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function exportarInventario() {
+    // Implementar exportación de inventario
+    alert('Funcionalidad de exportar inventario por implementar');
+}
+
+function exportarClientes() {
+    // Implementar exportación de clientes
+    alert('Funcionalidad de exportar clientes por implementar');
+}
+</script>
+{% endblock %}

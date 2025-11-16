@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - To-Do App{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid p-0">
+
+    <a href="{{ url_for('project.nuevo_proyecto') }}" class="btn btn-primary float-end mt-n1">
+        Nuevo Proyecto
+    </a>
+
+    <h1 class="h3 mb-3"><i class="fas fa-project-diagram me-1"></i> Projects</h1>
+
+    <div class="card">
+        <div class="card-body">
+            {% if not proyectos %}
+            <div class="text-center py-5">
+                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No hay proyectos aún</h4>
+                <p class="text-muted">Comienza creando tu primer proyecto</p>
+                <a href="{{ url_for('project.nuevo_proyecto') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Crear Proyecto
+                </a>
+            </div>
+            {% else %}
+
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <th>
+                        Proyecto
+                    </th>
+                    <th>
+                        Estado
+                    </th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    {% for proyecto_id, proyecto in proyectos.items() %}
+                    <tr>
+                        <td>
+
+                            {% if proyecto.estado == 'abierto' %}
+                            <a href="/proyecto/{{proyecto.id}}/detalle">
+                                <i class="fas fa-folder me-2"></i> {{ proyecto.nombre }}
+                            </a>
+                            {% else %}
+                            <i class="fas fa-folder me-2"></i> {{ proyecto.nombre }}
+                            {% endif %}
+
+                        </td>
+                        <td style="width: 1%;">
+                            <span class="badge bg-{{ 'success' if proyecto.estado == 'abierto' else 'secondary' }}">
+                                {{ proyecto.estado|title }}
+                            </span>
+                        </td>
+                        <td style="width: 1%;" nowrap>
+                            <a href="{{ url_for('project.toggle_proyecto_estado', proyecto_id=proyecto.id) }}"
+                                class="btn btn-info btn-sm">
+                                <i class="fas fa-{{ 'lock' if proyecto.estado == 'abierto' else 'unlock' }}"></i>
+                                {{ 'Cerrar' if proyecto.estado == 'abierto' else 'Abrir' }}
+                            </a>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+{% for proyecto_id, proyecto in proyectos.items() %}
+
+<div class="card card-proyecto" style="display: none;">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-folder me-2"></i>{{ proyecto.nombre }}
+                <span class="badge bg-{{ 'success' if proyecto.estado == 'abierto' else 'secondary' }} ms-2">
+                    {{ proyecto.estado|title }}
+                </span>
+            </h4>
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('project.toggle_proyecto_estado', proyecto_id=proyecto.id) }}"
+                    class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-{{ 'lock' if proyecto.estado == 'abierto' else 'unlock' }} me-1"></i>
+                    {{ 'Cerrar' if proyecto.estado == 'abierto' else 'Abrir' }}
+                </a>
+                {% if proyecto.estado == 'abierto' %}
+                <a href="/proyecto/{{proyecto.id}}/detalle" class="btn btn-outline-light btn-sm">
+                    Detalle
+                </a>
+                {% endif %}
+                {% if proyecto.estado == 'abierto' %}
+                <a href="{{ url_for('sprint.nuevo_sprint', proyecto_id=proyecto.id) }}"
+                    class="btn btn-outline-light btn-sm" style="display: none;">
+                    <i class="fas fa-plus me-1"></i>Nuevo Sprint
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

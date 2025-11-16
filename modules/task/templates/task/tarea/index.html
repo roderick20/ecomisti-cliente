@@ -1,0 +1,124 @@
+<!-- templates/productos/listar.html -->
+{% extends "base.html" %} {% block title %}Tareas{% endblock %} {% block content %}
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3><i class="fa-solid fa-list-check"></i> Tareas</h3>
+    </div>
+    <div class="col-auto ms-auto text-end mt-n1">
+        <a class="btn btn-primary" href="{{ url_for('task.task_create') }}"><i class="fas fa-plus"></i> Agregar</a>
+        <a class="btn btn-secondary" href="{{ url_for('task.generar_pdf_semanal') }}" target="_blank"> <i class="fa-solid fa-file-pdf"></i> PDF Semanal </a>
+        <a class="btn btn-secondary" href="{{ url_for('task.generar_pdf_diario') }}" target="_blank"> <i class="fa-solid fa-file-pdf"></i> PDF Diario </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="tblList" class="table mb-0 table-sm table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Título</th>
+                                <th>Descripción</th>
+                                <td style="width: 1%" nowrap>Fecha Inicio</td>
+                                <td style="width: 1%" nowrap>Fecha Fin</td>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if tareas %} {% for item in tareas %} {% set fecha_inicio = item.fecha_inicio.date() if item.fecha_inicio else None %}
+                            <tr class="{% if fecha_inicio and fecha_inicio < hoy %}table-danger {% elif fecha_inicio and fecha_inicio == hoy %}table-warning {% endif %}">
+                                <td style="width: 1%">{{ loop.index }}</td>
+                                <!-- ✅ Contador secuencial -->
+                                <td style="width: 1%" nowrap>{{ item.titulo }}</td>
+                                <td>{{ item.descripcion }}</td>
+                                <td>{{ item.fecha_inicio.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ item.fecha_fin.strftime('%Y-%m-%d') }}</td>
+                                <td style="width: 1%" nowrap>
+                                    <form action="{{ url_for('task.task_update_estado') }}" method="POST" style="display: inline">
+                                        <input type="hidden" name="uniqueid" value="{{ item.uniqueid }}" />
+                                        <button type="submit" class="btn btn-sm btn-info btn-cerrar"><i class="fa-solid fa-check"></i> Cerrar</button>
+                                    </form>
+
+                                    <a href="{{ url_for('task.task_update', uniqueid=item.uniqueid) }}" class="btn btn-sm btn-info"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
+
+                                    <form id="form-delete-{{ g.uniqueid }}" action="{{ url_for('task.task_delete', uniqueid=item.uniqueid) }}" method="POST" style="display: inline">
+                                        <button type="submit" class="btn btn-sm btn-danger" data-id="{{ item.uniqueid }}"><i class="fa-solid fa-trash"></i> Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %} {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block scripts %}
+
+<link href="https://cdn.datatables.net/v/bs5/dt-2.3.4/datatables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/v/bs5/dt-2.3.4/datatables.min.js"></script>
+
+<script>
+    let table = new DataTable("#tblList", {
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/2.0.8/i18n/es-ES.json",
+        },
+    });
+
+    document.querySelectorAll(".btn-cerrar").forEach((button) => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault(); // Evita el envío inmediato
+
+            // Reemplazar con spinner
+            this.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Cerrando...
+            `;
+            this.disabled = true; // Evitar múltiples clics
+            const form = this.closest("form");
+            form.submit();
+        });
+    });
+
+    document.querySelectorAll(".btn-danger").forEach((button) => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault(); // Evita el envío inmediato
+
+            const form = this.closest("form");
+            const originalContent = this.innerHTML; // Guardar contenido original
+
+            // Reemplazar con spinner
+            this.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Eliminando...
+            `;
+            this.disabled = true; // Evitar múltiples clics
+
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "¡No podrás revertir esta acción!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Envía el formulario si confirma
+                    form.submit();
+                } else {
+                    // Cancela → restaurar botón
+                    this.innerHTML = originalContent;
+                    this.disabled = false;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!-- templates/productos/form.html -->
+{% extends "base.html" %} {% block title %}{{ "Editar" if producto else "Nuevo" }} Producto{% endblock %} {% block content %}
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3>Agregar Usuario</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuario <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="username" name="username" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="password" name="password" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-check">
+                            <input class="form-check-input" type="checkbox" id="habilitado" name="habilitado" value="1" />
+                            <span class="form-check-label"> Habilitado </span>
+                        </label>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('facturacion.producto_index') }}" class="btn btn-secondary"> <i class="fas fa-times"></i> Cancelar </a>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ "Actualizar" if producto else "Guardar" }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

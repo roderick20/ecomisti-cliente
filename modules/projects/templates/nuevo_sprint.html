@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Sprint - To-Do App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-running me-2"></i>Crear Nuevo Sprint
+                </h4>
+                <small class="opacity-75">Para el proyecto: {{ proyecto.nombre }}</small>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del Sprint</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required 
+                               placeholder="Ej: Sprint 1 - Funcionalidades básicas">
+                        <div class="form-text">
+                            El sprint se creará en estado "Abierto" por defecto.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-save me-1"></i>Crear Sprint
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

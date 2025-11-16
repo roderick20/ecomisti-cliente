@@ -1,0 +1,81 @@
+<!-- templates/productos/form.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ "Editar" if producto else "Nuevo" }} Producto{% endblock %}
+
+{% block content %}
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3>Agregar Producto</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="producto_grupo_id" class="form-label">Categoría</label>
+                        <select class="form-select" id="producto_grupo_id" name="producto_grupo_id">
+                            {% for grupo in producto_grupo %}
+                            <option value="{{ grupo.uniqueid }}">
+                                {{ grupo.path }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="producto_unidad_id" class="form-label">Unidad</label>
+                        <select class="form-select" id="producto_unidad_id" name="producto_unidad_id">
+                            {% for grupo in producto_unidad %}
+                            <option value="{{ grupo.uniqueid }}">
+                                {{ grupo.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="enlace" class="form-label">Enlace <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="enlace" name="enlace" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="codigo" class="form-label">Código <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="codigo" name="codigo" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox"   id="habilitado" name="habilitado">
+                                    <span class="form-check-label">
+                                        Habilitado
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('facturacion.producto_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {{ "Actualizar" if producto else "Guardar" }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

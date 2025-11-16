@@ -1,0 +1,37 @@
+<!-- templates/productos/form.html -->
+{% extends "base.html" %} {% block title %}{{ "Editar" if producto else "Nuevo" }} Producto{% endblock %} {% block content %}
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3>Agregar Producto</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">fecha <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="fecha" name="fecha" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="compra" class="form-label">compra <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="compra" name="compra" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="venta" class="form-label">venta <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="venta" name="venta" required />
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('facturacion.tipo_cambio_index') }}" class="btn btn-secondary"> <i class="fas fa-times"></i> Cancelar </a>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Grabar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

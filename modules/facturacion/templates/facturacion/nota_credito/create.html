@@ -1,0 +1,47 @@
+{% extends "base.html" %} {% block title %}Agregar Venta{% endblock %} {% block content %}
+<div class="row mb-2 mb-xl-3">
+    <div class="col-auto d-none d-sm-block">
+        <h3><i class="fa-solid fa-file-invoice"></i> Agregar Nota de Crédito</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+
+                            <table class="table table-sm table-bordered">
+                                <tr>
+                                    <th>Documento/Serie</th>
+                                    <td colspan="2">
+                                        <select class="form-select" id="serie_id" name="serie_id" required>
+                                            {% if serie %} {% for item in serie %}
+                                            <option value="{{ item.id }}">{% if item.tipo_comprobante == '01' %} Factura/{{ item.serie }} {% elif item.tipo_comprobante == '03' %} Boleta de venta/{{ item.serie }} {% endif %}</option>
+                                            {% endfor %} {% endif %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Número</th>
+                                    <td colspan="2"><input type="text" class="form-control" id="correlativo" name="correlativo" required /></td>
+                                </tr>
+                            </table>
+              
+
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('facturacion.operacion_index') }}" class="btn btn-secondary"> <i class="fas fa-times"></i> Cancelar </a>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Grabar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block scripts %}
+<style>
+</style>
+
+<script>
+</script>
+{% endblock %}
