@@ -38,4 +38,3 @@ rows = db.query("""SELECT TOP (1000) [PersoneriaID]
   FROM [db_a9d155_ecomisti].[dbo].[Personeria]""", (25,))
 for row in rows:
     print(row.PersoneriaID, row.Personeria)
-

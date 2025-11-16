@@ -3,7 +3,7 @@ from flask import Flask, render_template, session, request, redirect, url_for
 from util.config import config
 
 from modules.auth import  bp as main_bp
-
+from modules.ordenes import  bp as orden_bp
 
 import os
 
@@ -19,7 +19,7 @@ def create_app(config_name='development'):
     # Registrar blueprints
     app.register_blueprint(main_bp, url_prefix='/')
 
-    # app.register_blueprint(facturacion_bp, url_prefix='/facturacion')
+    app.register_blueprint(orden_bp, url_prefix='/ordenes')
     # app.register_blueprint(task_bp, url_prefix='/task')
 
 
@@ -40,7 +40,9 @@ def create_app(config_name='development'):
     @app.context_processor
     def inject_session():
         username = session.get('username')
-        return dict(username=username)
+        return dict( 
+            username=session.get('username'),
+            nombre=session.get('nombre'))
 
     return app
 

@@ -1,0 +1,169 @@
+<!-- templates/productos/listar.html -->
+{% extends "base.html" %} {% block title %}Tareas{% endblock %} {% block content
+%}
+<!-- <div class="page-head">
+        <h2>Ordenes</h2>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">Ordenes</a></li>
+          <li class="breadcrumb-item active">Lista</li>
+        </ol>
+      </div> -->
+<div class="main-content">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="widget widget-fullwidth widget-small">
+        <div class="widget-head">
+          <div class="tools dropdown">
+            <a href="/ordenes/create" class="btn btn-sm btn-primary float-end">
+              <i class="fas fa-plus"></i> Nueva Orden
+            </a>
+          </div>
+          <div class="title">Órdenes de Servicio</div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-body">
+            <table
+              id="ordenesTable"
+              class="table table-sm table-striped table-bordered"
+              style="font-size: 12px; width: 100%"
+            >
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Ticket</th>
+                  <th>Estado</th>
+                  <th>Facturado</th>
+                  <th>Año</th>
+                  <th>Mes</th>
+                  <th>Fecha Recepción</th>
+                  <th>Hora Ingreso</th>
+                  <th>Hora Salida</th>
+                  <th>Transportista</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block scripts %}
+
+<style>
+  table.dataTable td.hidden {
+    display: none;
+  }
+</style>
+
+<link
+  href="https://cdn.datatables.net/v/bs5/dt-2.1.6/datatables.min.css"
+  rel="stylesheet"
+/>
+<script src="https://cdn.datatables.net/v/bs5/dt-2.1.6/datatables.min.js"></script>
+
+<script>
+  let ordenesTable;
+  $(document).ready(function () {
+    var ordenesTable = $("#ordenesTable").DataTable({
+      processing: true,
+      serverSide: true,
+      responsive: true,
+      autoWidth: false,
+      ajax: {
+        url: "/ordenes/getdatatable",
+        type: "POST",
+        //contentType: 'application/json',
+        // data: function (d) {
+        //   return JSON.stringify(d);
+        // },
+        error: function (xhr, error, thrown) {
+          console.error("Error en la llamada AJAX:", error);
+        },
+      },
+      columnDefs: [
+        {
+          targets: [0, 1, 2, 3, 4, 5],
+          className: "text-center",
+        },
+        {
+          targets: "_all", // Apply to all columns
+          orderable: false, // Disable sorting for all columns
+        },
+      ],
+      columns: [
+        {
+          data: null,
+          width: "1%",
+          render: function (data, type, row) {
+            return (
+              '<a class="btn btn-sm btn-info editar-orden" title="Editar" href="/ordenes/update/' +
+              row.UniqueId +
+              '"><i class="fa-solid fa-pen-to-square"></i></a> ' +
+              '<a class="btn btn-sm btn-info editar-orden"  title="Agregar productos" href="/ordenes/updateProductos/' +
+              row.UniqueId +
+              '"><i class="fa-solid fa-tag"></i></a> ' +
+              '<button class="btn btn-sm btn-danger eliminar-orden"><i class="fa-solid fa-trash"></i></button> ' +
+              '<a class="btn btn-sm btn-secondary" href="/ordenes/detail/' +
+              row.UniqueId +
+              '"> <i class="fa-solid fa-table-list"></i></a>'
+            );
+          },
+          createdCell: function (td, cellData, rowData, row, col) {
+            $(td).attr("nowrap", "nowrap");
+          },
+        },
+        { data: "Ticket" },
+        {
+          data: "Estado",
+          render: function (data, type, row) {
+            if (data == 0) {
+              return '<span class="badge bg-danger">Abierto</span>';
+            } else if (data == 1) {
+              return '<span class="badge bg-success">Cerrado</span>';
+            }
+          },
+        },
+        {
+          data: "Facturado",
+          render: function (data, type, row) {
+            if (data == 0) {
+              return "";
+            } else if (data == 1) {
+              return '<i class="fa-solid fa-square-check text-success" ></i>';
+            }
+          },
+        },
+        { data: "Anyo" },
+        { data: "Mes" },
+        { data: "FechaRecepcion" },
+        { data: "HoraIngreso" },
+        { data: "HoraSalida" },
+        { data: "TransportistaName" },
+      ],
+      language: {
+        url: "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json",
+      },
+    });
+  });
+
+  function deleteOrden(uniqueId) {
+    if (confirm("¿Está seguro de que desea eliminar esta orden de servicio?")) {
+      $.ajax({
+        url: '@Url.Action("Delete", "OrdenServicio")?uniqueId=' + uniqueId,
+        method: "DELETE",
+        success: function (result) {
+          ordenesTable.ajax.reload();
+          toastr.success("Orden de servicio eliminada con éxito");
+        },
+        error: function (error) {
+          toastr.error("Error al eliminar la orden de servicio");
+        },
+      });
+    }
+  }
+</script>
+{% endblock %}
