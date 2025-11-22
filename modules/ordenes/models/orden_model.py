@@ -5,6 +5,48 @@ from datetime import datetime
 class OrdenModel:
 
     @staticmethod
+    def getProductoGrupo():
+        query = 'SELECT [GrupoID],[Descripcion] FROM [dbo].[ProductoGrupo]'
+        data_result =  db.query(query)
+        data_dict = [row._asdict() for row in data_result] if data_result else []
+        return data_dict
+    
+
+    @staticmethod
+    def getProductos():
+        query = 'SELECT [ProductoID],[Descripcion],[GrupoID] FROM [dbo].[Producto]'
+        data_result =  db.query(query)
+        data_dict = [row._asdict() for row in data_result] if data_result else []
+        return data_dict
+    
+    @staticmethod
+    def searchPersoneria(search):
+        searchTerm = f'%{search}%'
+        query = 'SELECT [PersoneriaID], [Personeria] FROM [dbo].[Personeria] WHERE [Personeria] LIKE %s'
+       
+        data_result =  db.query(query,(searchTerm, ))
+        data_dict = [row._asdict() for row in data_result] if data_result else []
+        return data_dict
+    
+    @staticmethod
+    def get_placa_personeria_id(PersoneriaID):
+        query = 'SELECT [Placa] ,[Carreta] FROM [dbo].[PersoneriaVehiculo] WHERE [PersoneriaID] =  %s'       
+        data_result =  db.query(query,(PersoneriaID, ))
+        data_dict = [row._asdict() for row in data_result] if data_result else []
+        return data_dict
+    
+    @staticmethod
+    def get_direccion_personeria_id(PersoneriaID):
+        query = '''SELECT pd.[DireccionID], u.[ubicacion], pd.[Direccion]     
+                    FROM [dbo].[PersoneriaDireccion] pd
+                    LEFT JOIN [dbo].[UBICACIONES] u ON pd.[UbicacionID] = u.[idubicacion]
+                    WHERE pd.PersoneriaID = %s'''      
+        data_result =  db.query(query,(PersoneriaID, ))
+        data_dict = [row._asdict() for row in data_result] if data_result else []
+        return data_dict
+    
+
+    @staticmethod
     def get_table(request):
         try:
             # Obtener y limpiar parámetros DataTables
@@ -12,8 +54,6 @@ class OrdenModel:
             start = int(request.get('start', 0))
             length = int(request.get('length', 10))
             search_value = request.get('search', '').strip()
-
-      
 
             # Construcción segura de la cláusula WHERE y parámetros
             where_clause = ""
@@ -33,8 +73,7 @@ class OrdenModel:
                 LEFT JOIN [Personeria] tr ON os.TransportistaId = tr.PersoneriaID
                 {where_clause}
             """
-
-           
+          
             # Ejecutar count
             count_result = db.query(count_query, params)
             

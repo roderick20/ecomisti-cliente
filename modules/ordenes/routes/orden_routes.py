@@ -1,5 +1,5 @@
 # routes/categorias.py
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 
 from modules.ordenes.models.orden_model import OrdenModel
 from datetime import date
@@ -10,25 +10,65 @@ from .. import bp
 @bp.route('/orden')
 def orden_list():
     return render_template('/ordenes/orden/index.html')
-    # result = TareaModel.get_all()    
-    # print('task_index')
-    # print(result)
-    # if result['success']:
-    #     return render_template('/task/tarea/index.html', tareas = result['data'], hoy=date.today())
-    # else:
-    #     return render_template('error.html', error = result['error'])
 
 @bp.route('/getdatatable', methods=['POST'])
 def orden_get_table():
     if request.method == 'POST':
         try:
             result = OrdenModel.get_table(request.form)
-            return jsonify(result) 
-            
+            return jsonify(result)             
         except Exception as error:
             print(error)
 
+@bp.route('/getplacas', methods=['POST'])
+def orden_get_placas():
+    print(request)
+    if request.method == 'POST':
+        try:
+            result = OrdenModel.get_placa_personeria_id(request.form)
+            return jsonify(result)             
+        except Exception as error:
+            print(error)
 
+@bp.route('/getdirecciones', methods=['POST'])
+def orden_get_direcciones():   
+    cliente_id = request.form.get('clienteId')
+    try:
+        result = OrdenModel.get_direccion_personeria_id(cliente_id)
+        return jsonify(result)             
+    except Exception as error:
+        print(error)
+
+@bp.route('/create', methods=['GET', 'POST'])
+def orden_create():  
+    #if request.method == 'POST':  
+    productoGrupo = OrdenModel.getProductoGrupo()
+    productos = OrdenModel.getProductos()
+    return render_template('/ordenes/orden/create.html', 
+                           Transportista = session['nombre'],
+                           productoGrupo = productoGrupo, 
+                           productos = productos)
+
+@bp.route('/searchclient')
+def search_client():
+    search_term = request.args.get('q', '')
+    
+    # Llamar al método estático (ajustado más abajo)
+    result = OrdenModel.searchPersoneria(search_term)
+    
+    # Convertir resultados a formato esperado por Select2 o similar
+    results = [
+        {
+            'id': row['PersoneriaID'],
+            'text': row['Personeria']
+        }
+        for row in result
+    ]
+    
+    return jsonify({
+        'results': results,
+        'pagination': {'more': False}
+    })
 
 
 # @bp.route('/task/update/<string:uniqueid>', methods=['GET', 'POST'])

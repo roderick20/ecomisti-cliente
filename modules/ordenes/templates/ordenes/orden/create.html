@@ -1,113 +1,884 @@
 <!-- templates/productos/form.html -->
-{% extends "base.html" %}
-
-{% block title %}{{ "Editar" if producto else "Nuevo" }} Producto{% endblock %}
-
-{% block content %}
-<div class="row mb-2 mb-xl-3">
-    <div class="col-auto d-none d-sm-block">
-        <h3>Agregar Tarea</h3>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <form method="POST" id="form-create">
-
-                    <div class="mb-3">
-                        <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="titulo" name="titulo" required>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label for="fecha_inicio" class="form-label">Fecha Inicio <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
-                        </div>
-
-                        <div class="col-6 mb-3">
-                            <label for="fecha_fin" class="form-label">Fecha Fin <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="fecha_fin" name="fecha_fin" required>
-                        </div>
-                    </div>
-
-
-
-                    <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción <span
-                                class="text-danger">*</span></label>
-                        <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
-                    </div>
-
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end" id="cancel-btn">
-                        <a href="{{ url_for('task.task_index') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-primary" id="submit-btn">
-                            </span><i class="fas fa-save"></i> Grabar
-                        </button>
-                        <button type="submit" class="btn btn-primary d-none" id="submit-spin-btn" disabled>
-                            <i class="fas fa-save"></i> Grabar <i class="spinner-border spinner-border-sm"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
+{% extends "base.html" %} {% block title %}Agregar orden{% endblock %} {% block
+content %}
+<div class="main-content">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Nueva Orden de Servicio</h5>
         </div>
+        <div class="card-body">
+          <form
+            id="createForm"
+            asp-action="Create"
+            asp-controller="OrdenServicio"
+            method="post"
+          >
+            <div class="row mb-1">
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Ticket</label>
+                <input
+                  id="Ticket"
+                  type="number"
+                  class="form-control form-control-sm"
+                  value="<%= ticket %>"
+                />
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Año</label>
+                <input
+                  id="Anyo"
+                  class="form-control form-control-sm"
+                  required
+                />
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Mes</label
+                ><!---->
+                <select id="Mes" class="form-control form-control-sm">
+                  <option value=""></option>
+                  <option value="Enero">Enero</option>
+                  <option value="Febrero">Febrero</option>
+                  <option value="Marzo">Marzo</option>
+                  <option value="Abril">Abril</option>
+                  <option value="Mayo">Mayo</option>
+                  <option value="Junio">Junio</option>
+                  <option value="Julio">Julio</option>
+                  <option value="Agosto">Agosto</option>
+                  <option value="Septiembre">Septiembre</option>
+                  <option value="Octubre">Octubre</option>
+                  <option value="Noviembre">Noviembre</option>
+                  <option value="Diciembre">Diciembre</option>
+                </select>
+                <span class="text-danger"></span>
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Fecha Recepción</label>
+                <input
+                  id="FechaRecepcion"
+                  type="text"
+                  class="form-control form-control-sm"
+                  data-mask="00/00/0000"
+                  placeholder="DD/MM/AAAA"
+                />
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Hora Ingreso (HH:MM) </label>
+                <input
+                  id="HoraIngreso"
+                  type="text"
+                  class="form-control form-control-sm"
+                  data-mask="00:00"
+                  placeholder="--:--"
+                />
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Hora Salida (HH:MM) </label>
+                <input
+                  id="HoraSalida"
+                  type="text"
+                  class="form-control form-control-sm"
+                  data-mask="00:00"
+                  placeholder="--:--"
+                />
+              </div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-md-4">
+                <label class="form-label"
+                  >EO-RS Transportista<span class="text-danger">*</span></label
+                >
+                <input id="TransportistaId" class="form-control form-control-sm" value="{{Transportista}}" disabled/>
+              </div>
+              <div class="col-md-4" style="display: none;">
+                <label class="form-label">Gestor del servicio</label>
+                <select
+                  id="TransportistaServicioId"
+                  class="form-control form-control-sm"
+                ></select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label"
+                  >Tracto<span class="text-danger">*</span></label
+                >
+                <select id="Placa_Tracto" class="form-control form-control-sm"></select>
+              </div>
+              <div class="col-md-2">
+                <label for="Placa_Carreta" class="form-label"
+                  >Carreta<span class="text-danger">*</span></label
+                >
+                <select id="Placa_Carreta" class="form-control form-control-sm"></select>
+              </div>
+            </div>
+            <div class="row mb-1">
+              <div class="col-md-2">
+                <label class="form-label">Conductor Nombre</label>
+                <input
+                  id="ConductorNombre"
+                  class="form-control form-control-sm"
+                />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Conductor Licencia</label>
+                <input
+                  id="ConductorLicencia"
+                  class="form-control form-control-sm"
+                />
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Peso Inicial</label>
+                <input id="PesoInicial" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Peso Final</label>
+                <input id="PesoFinal" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Peso Neto</label>
+                <input id="PesoNeto" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-2" style="display: none;">
+                <label class="form-label">Sede</label>
+                <input id="Sede" class="form-control form-control-sm" />
+              </div>
+            </div>
+            <div class="row mb-1">
+              <div class="col-12">
+                <button
+                  type="button"
+                  class="btn btn-primary float-end"
+                  onclick="openDialogAdd()"
+                >
+                  <i class="fa-solid fa-plus"></i> Agregar
+                </button>
+              </div>
+            </div>
+            <div class="row mb-1">
+              <div class="col-12">
+                <div class="table-responsive">
+                  <table
+                    id="tblData"
+                    class="table table-sm table-striped table-bordered"
+                    style="font-size: 12px; width: 100%"
+                  >
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Guía de Remisión</th>
+                        <th>Guía de Transportista</th>
+                        <th>Cliente</th>
+                        <th>Fuente Generación</th>
+                        <th>Tipo</th>
+                        <th>Tipo de Método</th>
+                        <th>Tipo de Tratamiento</th>
+                        <th>Descripción</th>
+                        <th>Peso(Kg)</th>
+                        <th>Manifiesto Código</th>
+                        <th>Observaciones</th>
+                        <th>Código</th>
+                        <th>Volumen</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="mt-3">
+                <button
+                  type="button"
+                  id="btnSave"
+                  class="btn btn-primary float-end"
+                  onclick="save()"
+                >
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Grabar
+                </button>
+                <a href="/ordenes" class="btn btn-secondary"
+                  ><i class="fa-solid fa-arrow-left"></i> Regresar</a
+                >
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-{% block scripts %}
-<link href="/static/datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
-<script src="/static/datepicker/js/bootstrap-datepicker.min.js"></script>
-<script src="/static/datepicker/locales/bootstrap-datepicker.es.min.js"></script>
+
+<div class="modal fade" id="formModal" tabindex="-1" style="display: none" aria-hidden="true" >
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title h4">Agregar</h5>
+        <button class="close" type="button " data-dismiss="modal" aria-hidden="true"><i class="icon s7-close"></i></button>
+      </div>
+      <div class="modal-body m-3">
+        <form id="formControl">
+          <input type="hidden" id="UniqueIdAdress" />
+
+          <div class="row">
+            <div class="col-6">
+              <div class="mb-2">
+                <label class="form-label" for="Item" >Item<span class="text-danger">*</span></label >
+                <input type="text" class="form-control form-control-sm" id="Item" autocomplete="off" />
+              </div>
+              <div class="mb-2">
+                <label for="GuiaRemision" class="form-label">Guía de Remisión</label>
+                <input id="GuiaRemision" class="form-control form-control-sm" />
+                <span for="GuiaRemision" class="text-danger"></span>
+              </div>
+              <div class="mb-2">
+                <label for="GuiaTransportista" class="form-label">Guía del Transportista</label>
+                <input id="GuiaTransportista" class="form-control form-control-sm" />
+                <span for="GuiaTransportista" class="text-danger"></span>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="Tipo">Generador<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm" id="ClienteId"/>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="FuenteGeneracion">Fuente Generación</label>
+                <select class="form-control form-control-sm" id="ClienteDireccionId"></select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="ManifiestoCodigo">Manifiesto Código<span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="ManifiestoCodigo" autocomplete="off" />
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="Codigo">Código de Basilea</label>
+                <input type="text" class="form-control form-control-sm" id="Codigo" autocomplete="off" />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="mb-2">
+                <label class="form-label" for="Peso" >Peso(Kg)<span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" id="Peso" autocomplete="off" />
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="Volumen">Volumen</label>
+                <input type="text" class="form-control form-control-sm" id="Volumen" autocomplete="off"/>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="Tipo">Tipo</label>
+                <select class="form-control form-control-sm" id="Tipo">
+                  <option value="HOSPITALARIO">HOSPITALARIO</option>
+                  <option value="NO PELIGROSO">NO PELIGROSO</option>
+                  <option value="PELIGROSO">PELIGROSO</option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="Metodo">Tipo de Método</label>
+                <select class="form-control form-control-sm" id="Metodo">
+                  <option value=""></option>
+                  <option value="MÉTODO DE TRATAMIENTO">
+                    MÉTODO DE TRATAMIENTO
+                  </option>
+                  <option value="MÉTODO DE DISPOSICIÓN FINAL">
+                    MÉTODO DE DISPOSICIÓN FINAL
+                  </option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="Tratamiento">Tipo de Tratamiento</label>
+                <select class="form-control form-control-sm" id="Tratamiento"></select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="Descripcion">Descripción</label>
+                <input type="text" class="form-control form-control-sm" id="Descripcion" />
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="Observaciobes">Observaciones</label>
+                <input type="text" class="form-control form-control-sm" id="Observaciobes" autocomplete="off" />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fa-solid fa-xmark"></i> Cerrar
+        </button>
+        <button type="button" class="btn btn-primary" onclick="addTR()">
+          Agregar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<style>
+  .btn-primary {
+    color: #fff;
+    background-color: rgb(167 206 57) !important;
+    border-color: rgb(167 206 57) !important;
+  }
+  .form-label {
+    margin-bottom: 0 !important;
+  }
+
+  /* .select2-selection {
+    height: 33px !important;
+  }
+  .select2-search__field {
+    width: 100% !important;
+  }
+  .select2 {
+    width: 100% !important;
+  } */
+
+  .ui-autocomplete {
+    z-index: 1060 !important;
+  }
+
+    .ui-autocomplete-loading {
+    background: white url("/static/img/reload.gif") right center no-repeat;
+  }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+
 <script>
+  function addProducto() {
+    $("#tblProductos tbody").append(
+      `<tr>
+                <td class="ProductoId" data-id="${$(
+                  "#ProductoId option:selected"
+                ).val()}">${$("#ProductoId option:selected").text()}</td>
+                <td class="ProductoCantidad" style="text-align: end;">${$(
+                  "#ProductoCantidad"
+                ).val()}</td>
+                <td><button class="btn btn-sm btn-danger" onclick="eliminarFila(this)"><i class="fa-solid fa-trash"></i></button></td>                                         
+            </tr>`
+    );
+    $("#ProductoCantidad").val("");
+    $("#ProductoId").val(null).trigger("change");
+  }
 
-    // Establecer la fecha actual en el campo
-    const hoy = new Date().toISOString().split('T')[0]; // Formato: "yyyy-mm-dd"
-    document.getElementById('fecha_inicio').value = hoy;
+  function eliminarFila(button) {
+    const row = button.closest("tr");
+    row.remove();
+  }
 
-    $('#fecha_inicio').datepicker({
-        format: "yyyy-mm-dd",
-        language: "es",
-        autoclose: true,
-        todayHighlight: true
+  var productoGrupo = JSON.parse('{{productoGrupo|tojson|safe}}');
+  var productos = JSON.parse('{{productos|tojson|safe}}');
+
+  const subgrupoProductoId = productoGrupo.filter(
+    (item) => item.GrupoID.length === 6
+  );
+  $("#ProductoId").html("");
+  $("#ProductoId").append(`<option value=""></option>`);
+  productos.forEach(function (obj) {
+    $("#ProductoId").append(
+      `<option value="${obj.ProductoID}">${obj.Descripcion}</option>`
+    );
+  });
+
+  $("#ProductoId").select2();
+
+  $("#Metodo").change(function () {
+    $("#Tratamiento").html("");
+    if ($(this).val() == "MÉTODO DE TRATAMIENTO") {
+      $("#Tratamiento").html(`
+            <option value="DESTRUCCION MECANICA">DESTRUCCION MECANICA</option>
+            <option value="ESTABILIZACIÓN BIOLÓGICA">ESTABILIZACIÓN BIOLÓGICA</option>
+            <option value="SOLIDIFICACION">SOLIDIFICACIÓN</option>
+            <option value="VOLATILIZACIÓN">VOLATILIZACIÓN</option>
+            <option value="ENCAPSULAMIENTO">ENCAPSULAMIENTO</option>
+            <option value="NEUTRALIZACIÓN">NEUTRALIZACIÓN</option>`);
+    }
+    if ($(this).val() == "MÉTODO DE DISPOSICIÓN FINAL") {
+      $("#Tratamiento").html(`
+            <option value="CONFINAMIENTO">CONFINAMIENTO</option>`);
+    }
+  });
+
+
+  $(function () {
+
+    $("#Codigo").autocomplete({
+      source: function (request, response) {
+        $.ajax({
+          url: '@Url.Action("GetSuggestionsCodigo", "Orden")',
+          dataType: "json",
+          data: { term: request.term },
+          success: function (data) {
+            console.log(data);
+            response(
+              $.map(data, function (item) {
+                return {
+                  label: item.name,
+                  value: item.name,
+                  id: item.id,
+                };
+              })
+            );
+          },
+        });
+      },
+      minLength: 2,
+    });
+  });
+
+  var formModal = new bootstrap.Modal(document.getElementById("formModal"));
+
+  function openDialogAdd() {
+    $("#formControl")[0].reset();
+    $("#Id").val("");
+    $("#formModal .modal-title").text("Añadir");
+    formModal.show();
+
+    $("#Item").val(
+      parseInt(document.getElementById("tblData").tBodies[0].rows.length) + 1
+    );
+  }
+
+  function addTR() {
+    $("#tblData tbody").append(
+      `<tr>
+                    <td class="Item">${$("#Item").val()}</td>
+                    <td class="GuiaRemision">${$("#GuiaRemision").val()}</td>
+                    <td class="GuiaTransportista">${$(
+                      "#GuiaTransportista"
+                    ).val()}</td>
+                    <td class="ClienteId" data-id="${
+                      $("#ClienteId").select2("data")[0].id
+                    }">${$("#ClienteId").select2("data")[0].text}</td>
+                    <td class="ClienteDireccionId" data-id="${$(
+                      "#ClienteDireccionId option:selected"
+                    ).val()}">${$(
+        "#ClienteDireccionId option:selected"
+      ).text()}</td>
+                    <td class="Tipo" data-id="${$(
+                      "#Tipo option:selected"
+                    ).val()}">${$("#Tipo option:selected").text()}</td>
+                    <td class="Metodo" data-id="${$(
+                      "#Metodo option:selected"
+                    ).val()}">${$("#Metodo option:selected").text()}</td>
+                    <td class="Tratamiento" data-id="${$(
+                      "#Tratamiento option:selected"
+                    ).val()}">${$("#Tratamiento option:selected").text()}</td>
+                    <td class="Descripcion">${$("#Descripcion").val()}</td>
+                    <td class="Peso">${$("#Peso").val()}</td>
+                    <td class="ManifiestoCodigo">${$(
+                      "#ManifiestoCodigo"
+                    ).val()}</td>
+                    <td class="Observaciobes">${$("#Observaciobes").val()}</td>
+                    <td class="Codigo">${$("#Codigo").val()}</td>
+                    <td class="Volumen">${$(
+                      "#Volumen"
+                    ).val()}</td>                                       
+                </tr>`
+    );
+    formModal.hide();
+  }
+
+  function applyDateMask(input) {
+    input.addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, "");
+      if (value.length > 8) value = value.slice(0, 8);
+      if (value.length > 4) value = value.slice(0, 4) + "/" + value.slice(4);
+      if (value.length > 2) value = value.slice(0, 2) + "/" + value.slice(2);
+      e.target.value = value;
+    });
+  }
+
+  function applyShortTimeMask(input) {
+    input.addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, "");
+      if (value.length > 4) value = value.slice(0, 4);
+      if (value.length > 2) value = value.slice(0, 2) + ":" + value.slice(2);
+      e.target.value = value;
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.querySelector('input[data-mask="0000-00-00"]');
+    const shortTimeInput = document.querySelectorAll(
+      'input[data-mask="00:00"]'
+    );
+
+    if (dateInput) applyDateMask(dateInput);
+    //if (shortTimeInput) applyShortTimeMask(shortTimeInput);
+
+    shortTimeInput.forEach((input) => applyShortTimeMask(input));
+  });
+
+  function save() {
+    $("#btnSave").html('<i class="fas fa-spinner fa-spin"></i>');
+
+    if ($("#TransportistaId").val() == null) {
+      alert("Ingrese Transportista");
+      $("#btnSave").html('<i class="fa-solid fa-cloud-arrow-up"></i> Grabar');
+      return;
+    }
+
+    var entity = {
+      Ticket: $("#Ticket").val() || "",
+      Anyo: $("#Anyo").val() || "",
+      Mes: $("#Mes").val() || "",
+      FechaRecepcion: $("#FechaRecepcion").val() || "",
+      HoraIngreso: $("#HoraIngreso").val() || "",
+      HoraSalida: $("#HoraSalida").val() || "",
+      ConstanciaNumero: $("#ConstanciaNumero").val() || "",
+      CertificadoNumero: $("#CertificadoNumero").val() || "",
+      TransportistaId: parseInt($("#TransportistaId").val()) || "",
+      Placa_Tracto: $("#Placa_Tracto").val(),
+      Placa_Carreta: $("#Placa_Carreta").val(),
+      TransportistaServicioId: $("#TransportistaServicioId").val(),
+      Placa_TractoServicio: $("#Placa_Tracto").val(),
+      Placa_CarretaServicio: $("#Placa_Carreta").val(),
+
+      ConductorLicencia: $("#ConductorLicencia").val() || "",
+      ConductorNombre: $("#ConductorNombre").val() || "",
+      PesoInicial: $("#PesoInicial").val() || "",
+      PesoFinal: $("#PesoFinal").val() || "",
+      PesoNeto: $("#PesoNeto").val() || "",
+      Sede: $("#Sede").val() || "",
+      ProductoId: $("#ProductoId").val() || "",
+    };
+
+    var datosTabla = [];
+    $("#tblData tbody tr").each(function () {
+      var fila = $(this);
+      var item = {
+        Item: fila.find(".Item").text() || "",
+        GuiaRemision: $("#GuiaRemision").val() || "",
+        GuiaTransportista: $("#GuiaTransportista").val() || "",
+        ClienteId: fila.find(".ClienteId").attr("data-id") || "",
+        ClienteDireccionId:
+          fila.find(".ClienteDireccionId").attr("data-id") || "",
+
+        Tipo: fila.find(".Tipo").text() || "",
+        Tratamiento: fila.find(".Tratamiento").text() || "",
+
+        Descripcion: fila.find(".Descripcion").text() || "",
+        Metodo: fila.find(".Metodo").text() || "",
+
+        ProductoId: "",
+
+        Peso: fila.find(".Peso").text() || "",
+        ManifiestoCodigo: fila.find(".ManifiestoCodigo").text() || "",
+        Observaciones: fila.find(".Observaciones").text() || "",
+        Codigo: fila.find(".Codigo").text() || "",
+
+        Volumen: fila.find(".Volumen").text() || "",
+        Url: fila.find(".Url").text() || "",
+      };
+      datosTabla.push(item);
     });
 
-    $('#fecha_fin').datepicker({
-        format: "yyyy-mm-dd",
-        language: "es",
-        autoclose: true,
-        todayHighlight: true
+    console.log(datosTabla);
+
+    var datosCompletos = {
+      servicios: datosTabla,
+      orden: entity,
+    };
+
+    $.ajax({
+      url: "/ordenes/Create",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(datosCompletos),
+      success: async function (result) {
+        window.location.href = "/ordenes";
+      },
+      error: function (xhr, status, error) {
+        alert("Error al guardar: " + error);
+      },
     });
+  }
 
-    // document.getElementById('submit-btn').addEventListener('click', function () {
-    //     const text = document.getElementById('btn-text');
-    //     const spinner = document.getElementById('btn-spinner');
+  $(document).ready(function () {
+    const meses = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    const fecha = new Date();
+    const numeroMesActual = fecha.getMonth();
+    $("#Mes").val(meses[numeroMesActual]);
 
-    //     // Ocultar texto y mostrar spinner
-    //     text.classList.add('d-none');
-    //     spinner.classList.remove('d-none');
+    const dia = fecha.getDate().toString().padStart(2, "0");
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, "0"); // +1 porque getMonth() devuelve 0-11
+    const anio = fecha.getFullYear();
+    $("#FechaRecepcion").val(`${anio}-${mes}-${dia}`);
+    $("#Anyo").val(anio);
 
-    //     // Opcional: deshabilitar el botón para evitar múltiples envíos
-    //     //this.disabled = true;
-    // });
-    document.getElementById('form-create').addEventListener('submit', function (e) {
-        if (!this.checkValidity()) {
-            return;
-        }
+    const horas = fecha.getHours().toString().padStart(2, "0");
+    const minutos = fecha.getMinutes().toString().padStart(2, "0");
 
-        const cancel_btn = document.getElementById('cancel-btn');
-        cancel_btn.disabled = true;
+    $("#HoraIngreso").val(`${horas}:${minutos}`);
+    $("#HoraSalida").val(`${horas}:${minutos}`);
 
-        const btn = document.getElementById('submit-btn');
-        btn.classList.add('d-none');
+    // $("#TransportistaId")
+    //   .select2({
+    //     placeholder: "Selecciona un Transportista",
+    //     allowClear: true,
+    //     ajax: {
+    //       url: "/listaprecios/searchclient",
+    //       dataType: "json",
+    //       type: "get",
+    //       delay: 250,
+    //       /*data: function (params) {
+    //                 return {
+    //                     term: params.term
+    //                 };
+    //             },*/
+    //       processResults: function (data) {
+    //         return {
+    //           results: data.results,
+    //         };
+    //       },
+    //       cache: true,
+    //     },
+    //     minimumInputLength: 1,
+    //   })
+    //   .on("select2:select", function (e) {
+    //     var data = e.params.data;
 
-        const btn_spin = document.getElementById('submit-spin-btn');
-        btn_spin.classList.remove('d-none');
+    //     $("#TransportistaPlacaId").html("");
+    //     //var formData = new FormData();
+    //     //formData.append('transportistaId', data.id);
+
+    //     $.ajax({
+    //       url: "/ordenes/getTransportistaPlaca",
+    //       type: "POST",
+    //       //contentType: false,
+    //       //processData: false,
+    //       //data: formData,
+    //       data: { transportistaId: data.id },
+    //       success: async function (data) {
+    //         const placaTractos = [
+    //           ...new Set(data.results.map((item) => item.Placa.toUpperCase())),
+    //         ].filter((placa) => placa !== "");
+
+    //         $("#Placa_Tracto").html(``);
+    //         $("#Placa_Tracto").append(`<option value=""></option>`);
+    //         placaTractos.forEach(function (obj) {
+    //           $("#Placa_Tracto").append(
+    //             `<option value="${obj}">${obj}</option>`
+    //           );
+    //         });
+
+    //         const placaCarretas = [
+    //           ...new Set(
+    //             data.results.map((item) => item.Carreta.toUpperCase())
+    //           ),
+    //         ].filter((placa) => placa !== "");
+
+    //         $("#Placa_Carreta").append(``);
+    //         $("#Placa_Carreta").append(`<option value=""></option>`);
+    //         placaCarretas.forEach(function (obj) {
+    //           $("#Placa_Carreta").append(
+    //             `<option value="${obj}">${obj}</option>`
+    //           );
+    //         });
+    //       },
+    //     });
+    //   })
+    //   .on("select2:unselect", function () {
+    //     $("#TransportistaPlacaId").html("");
+    //   });
+
+    $("#TransportistaServicioId")
+      .select2({
+        placeholder: "Selecciona un Gestor de Servicio",
+        allowClear: true,
+        ajax: {
+          url: "/listaprecios/searchclient",
+          dataType: "json",
+          type: "get",
+          delay: 250,
+          // data: function (params) {
+          //     return {
+          //         term: params.term
+          //     };
+          // },
+          processResults: function (data) {
+            return {
+              results: data.results,
+            };
+          },
+          cache: true,
+        },
+        minimumInputLength: 1,
+      })
+      .on("select2:select", function (e) {
+        var data = e.params.data;
+
+        $("#Placa_TractoServicio").html("");
+        $("#Placa_CarretaServicio").html("");
+        var formData = new FormData();
+        formData.append("transportistaId", data.id);
+
+        // $.ajax({
+        //     url: "/tramitedoc/ordenes/getTransportistaPlaca",
+        //     type: "POST",
+        //     contentType: false,
+        //     processData: false,
+        //     data: formData,
+        //     success: async function (data) {
+
+        //         const placaTractos = [...new Set(
+        //             data.results
+        //                 .map(item => item.placaTracto.toUpperCase())
+        //         )].filter(placa => placa !== "");
+
+        //         $('#Placa_TractoServicio').html(``);
+        //         $('#Placa_TractoServicio').append(`<option value=""></option>`);
+        //         placaTractos.forEach(function (obj) {
+        //             $('#Placa_TractoServicio').append(`<option value="${obj}">${obj}</option>`);
+        //         });
+
+        //         const placaCarretas = [...new Set(
+        //             data.results
+        //                 .map(item => item.placaCarreta.toUpperCase())
+        //         )].filter(placa => placa !== "");
+
+        //         $('#Placa_CarretaServicio').append(``);
+        //         $('#Placa_CarretaServicio').append(`<option value=""></option>`);
+        //         placaCarretas.forEach(function (obj) {
+        //             $('#Placa_CarretaServicio').append(`<option value="${obj}">${obj}</option>`);
+        //         });
+        //     }
+        // });
+      })
+      .on("select2:unselect", function () {
+        $("#TransportistaPlacaId").html("");
+      });
+
+      $("#ClienteId").autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: "/ordenes/searchclient",
+                        dataType: "json",
+                        data: {
+                            q: request.term
+                        },
+                        success: function(data) {
+                            const mapped = data.results.map(item => ({
+                                label: item.text,    // Lo que se muestra
+                                value: item.text,
+                                id: item.id      // Lo que se guarda al seleccionar
+                            }));
+                            response(mapped);
+                        },
+                        error: function() {
+                            response([]);
+                        }
+                    });
+                },
+                minLength: 2,
+                select: function(event, ui) {
+                    $(this).val(ui.item.label);
+                    $("#ClienteId").val(ui.item.label);
+                    //$("#cliente_id").val(ui.item.value);
+                    console.log("Cliente seleccionado:", ui.item.value, ui.item.label);
+                    $("#ClienteId").val(ui.item.label);
+
+                     $.ajax({
+                    url: "/ordenes/getdirecciones",
+                    type: "post",
+                    // contentType: false,
+                    // processData: false,
+                    data: { clienteId: ui.item.id },
+                    success: async function (data) {
+                        data.forEach(function (obj) {
+                            $('#ClienteDireccionId').append(`<option value="${obj.DireccionID}">${obj.Direccion}</option>`);
+                        });
+                    }
+                });
+
+                },
+                change: function(event, ui) {
+                    if (!ui.item) {
+                        // El usuario escribió algo que no está en la lista
+                        $("#cliente_id").val("");
+                    }
+                }
+            });
+
+
+    // $("#ClienteId")
+    //   .select2({
+    //     placeholder: "Selecciona un Cliente",
+    //     dropdownParent: $("#formModal"),
+    //     allowClear: true,
+    //     ajax: {
+    //       url: "/listaprecios/searchclient",
+    //       dataType: "json",
+    //       type: "get",
+    //       delay: 250,
+    //       /*data: function (params) {
+    //                 return {
+    //                     term: params.term
+    //                 };
+    //             },*/
+    //       processResults: function (data) {
+    //         return {
+    //           results: data.results,
+    //         };
+    //       },
+    //       cache: true,
+    //     },
+    //     minimumInputLength: 1,
+    //   })
+    //   .on("select2:select", function (e) {
+    //     var data = e.params.data;
+
+    //     $("#ClienteDireccionId").html("");
+    //     // var formData = new FormData();
+    //     // formData.append('clienteId', data.id);
+
+    //     $.ajax({
+    //       url: "/ordenes/getClienteDireccion",
+    //       type: "post",
+    //       // contentType: false,
+    //       // processData: false,
+    //       data: { clienteId: data.id },
+    //       success: async function (data) {
+    //         data.results.forEach(function (obj) {
+    //           $("#ClienteDireccionId").append(
+    //             `<option value="${obj.id}">${obj.text}</option>`
+    //           );
+    //         });
+    //       },
+    //     });
+    //   })
+    //   .on("select2:unselect", function () {
+    //     $("#TransportistaPlacaId").html("");
+    //   });
+
+    $("#createForm").submit(function (e) {
+      e.preventDefault();
+      $.ajax({
+        url: this.action,
+        type: this.method,
+        data: $(this).serialize(),
+        success: function (result) {
+          toastr.success(result.message);
+          window.location.href = '@Url.Action("Index", "OrdenServicio")';
+        },
+        error: function (error) {
+          toastr.error("Error al crear la orden de servicio");
+        },
+      });
     });
+  });
 </script>
 {% endblock %}
