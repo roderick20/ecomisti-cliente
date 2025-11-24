@@ -1,17 +1,12 @@
+#v 1.0.0
 from flask import session
 import uuid
-#from werkzeug.security import generate_password_hash, check_password_hash
-#from config import Config
 from util.database import db
 import bcrypt
 class Auth:
     
     
-# def get_db_connection():
-#     return mysql.connector.connect(**Config.DB_CONFIG)
 
-# def allowed_file(filename):
-#     return '.' in filename and filename.rsplit('.', 1)[1].lower() in Config.ALLOWED_EXTENSIONS
 
     @staticmethod
     def get_current_user(session):
@@ -38,7 +33,7 @@ class Auth:
         #query = "SELECT * FROM usuario WHERE username = %s AND habilitado = TRUE"
         query = "SELECT * FROM [dbo].[Personeria] WHERE NroIdentidad = %s AND password = %s"
         data = db.query(query, (username, password))[0]
-        print(data)
+        
         if data:
             # stored_hash = data.password.encode('utf-8')  # bcrypt espera bytes
             # if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
@@ -46,6 +41,7 @@ class Auth:
             session['user_id'] = data.PersoneriaID
             session['username'] = data.NroIdentidad
             session['nombre'] = data.Personeria
+            
 
             print("¡Inicio de sesión exitoso!")
             return True

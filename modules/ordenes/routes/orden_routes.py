@@ -42,12 +42,18 @@ def orden_get_direcciones():
 @bp.route('/create', methods=['GET', 'POST'])
 def orden_create():  
     #if request.method == 'POST':  
+<<<<<<< Updated upstream
     productoGrupo = OrdenModel.getProductoGrupo()
     productos = OrdenModel.getProductos()
     return render_template('/ordenes/orden/create.html', 
                            Transportista = session['nombre'],
                            productoGrupo = productoGrupo, 
                            productos = productos)
+=======
+    placas = OrdenModel.get_placa_personeria_id(session.get('user_id'))
+    return render_template('/ordenes/orden/create.html', 
+                           placas = placas)
+>>>>>>> Stashed changes
 
 @bp.route('/searchclient')
 def search_client():

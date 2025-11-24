@@ -1,5 +1,4 @@
 <!-- templates/productos/form.html -->
-<<<<<<< Updated upstream
 {% extends "base.html" %} {% block title %}Agregar orden{% endblock %} {% block
 content %}
 <div class="main-content">
@@ -312,118 +311,15 @@ content %}
 {% endblock %} {% block scripts %}
 <style>
   .btn-primary {
-=======
-{% extends "base.html" %} {% block title %}Agregar orden{% endblock %} {% block content %}
-<div class="main-content">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Nueva Orden de Servicio</h5>
-                </div>
-                <div class="card-body">
-                    <form id="createForm" asp-action="Create" asp-controller="OrdenServicio" method="post">
-                        <label class="form-label" style="margin-bottom: 0px">EO-RS Transportista</label>
-                        <hr style="margin-top: 0px" />
-                        <div class="row mb-1">
-                            <div class="col-md-4">
-                                <label class="form-label">RUC</label>
-                                <input id="" class="form-control form-control-sm" value="{{session_username}}" disabled />
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Razón Social<span class="text-danger">*</span></label>
-                                <input id="" class="form-control form-control-sm" value="{{session_nombre}}" disabled />
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Tracto<span class="text-danger">*</span></label>
-                                <select id="Placa_Tracto" class="form-control form-control-sm">
-                                    {% if placas %} {% for item in placas %}
-                                    <option value="{{ item.Placa }}">{{ item.Placa }}</option>
-                                    {% endfor %} {% endif %}
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label for="Placa_Carreta" class="form-label">Carreta<span class="text-danger">*</span></label>
-                                <select id="Placa_Carreta" class="form-control form-control-sm">
-                                    {% if placas %} {% for item in placas %} {% if item.Carreta and item.Carreta.strip() != '' %}
-                                    <option value="{{ item.Carreta }}">{{ item.Carreta }}</option>
-                                    {% endif %} {% endfor %} {% endif %}
-                                </select>
-                            </div>
-                        </div>
-                        <label class="form-label" style="margin-bottom: 0px; margin-top: 20px">Gestor del servicio</label>
-                        <hr style="margin-top: 0px" />
-                        <div class="row mb-1">
-                            <div class="col-md-4">
-                                <label class="form-label">RUC</label>
-                                <div class="input-group mb-3">
-                                    <input class="form-control form-control-sm" type="text" />
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Razón Social<span class="text-danger">*</span></label>
-                                <input id="TransportistaId" class="form-control form-control-sm" disabled />
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Dirección<span class="text-danger">*</span></label>
-                                <input id="TransportistaId" class="form-control form-control-sm" />
-                            </div>
-                        </div>
-                        <div class="row mb-1">
-                            <div class="col-md-2">
-                                <label class="form-label">Fecha Recepción</label>
-                                <input id="FechaRecepcion" type="text" class="form-control form-control-sm" data-mask="00/00/0000" placeholder="DD/MM/AAAA" />
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Conductor Nombre</label>
-                                <input id="ConductorNombre" class="form-control form-control-sm" />
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Conductor Licencia</label>
-                                <input id="ConductorLicencia" class="form-control form-control-sm" />
-                            </div>
-                        </div>
-
-                        <div class="row mt-5">
-                            <div class="col-6">
-                                <a href="/ordenes" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Regresar</a>
-                            </div>
-                            <div class="col-6" style="text-align: right">
-                                <button type="button" id="btnSave" class="btn btn-primary float-end" onclick="save()"><i class="fa-solid fa-cloud-arrow-up"></i> Grabar</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% endblock %} {% block scripts %}
-<style>
-    /* .btn-primary {
->>>>>>> Stashed changes
     color: #fff;
     background-color: rgb(167 206 57) !important;
     border-color: rgb(167 206 57) !important;
   }
   .form-label {
     margin-bottom: 0 !important;
-<<<<<<< Updated upstream
   }
 
   /* .select2-selection {
-=======
-  } */
-
-    /* .select2-selection {
->>>>>>> Stashed changes
     height: 33px !important;
   }
   .select2-search__field {
@@ -433,21 +329,13 @@ content %}
     width: 100% !important;
   } */
 
-<<<<<<< Updated upstream
   .ui-autocomplete {
-=======
-    /* .ui-autocomplete {
->>>>>>> Stashed changes
     z-index: 1060 !important;
   }
 
     .ui-autocomplete-loading {
     background: white url("/static/img/reload.gif") right center no-repeat;
-<<<<<<< Updated upstream
   }
-=======
-  } */
->>>>>>> Stashed changes
 </style>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -455,7 +343,6 @@ content %}
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
 
-<<<<<<< Updated upstream
 <script>
   function addProducto() {
     $("#tblProductos tbody").append(
@@ -994,7 +881,4 @@ content %}
     });
   });
 </script>
-=======
-<script></script>
->>>>>>> Stashed changes
 {% endblock %}
