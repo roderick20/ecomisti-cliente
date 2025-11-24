@@ -3,6 +3,10 @@ from flask import Flask, render_template, session, request, redirect, url_for
 from util.config import config
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
@@ -20,10 +24,14 @@ def create_app(config_name='development'):
     # Registrar blueprints
     app.register_blueprint(main_bp, url_prefix='/')
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
     app.register_blueprint(orden_bp, url_prefix='/ordenes')
     # app.register_blueprint(task_bp, url_prefix='/task')
 
+=======
+    app.register_blueprint(orden_bp, url_prefix='/ordenes')
+>>>>>>> Stashed changes
 =======
     app.register_blueprint(orden_bp, url_prefix='/ordenes')
 >>>>>>> Stashed changes
@@ -44,16 +52,22 @@ def create_app(config_name='development'):
     @app.context_processor
     def inject_session():
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         username = session.get('username')
         return dict( 
             username=session.get('username'),
             nombre=session.get('nombre'))
 =======
+=======
+>>>>>>> Stashed changes
         return dict(
             session_username = session.get('username'),
             session_nombre = session.get('nombre'),
             session_user_id = session.get('user_id')
         )
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
     return app
