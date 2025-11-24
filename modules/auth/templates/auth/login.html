@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión - Eco-Misti S.A.C.</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="static/lib/stroke-7/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="static/lib/perfect-scrollbar/css/perfect-scrollbar.css"
+    />
+    <link rel="stylesheet" type="text/css" href="static/css/app.css" />
+    <style>
+      .am-splash-screen {
+        background-color: #00a766 !important;
+      }
+      .btn-primary {
+        color: #fff;
+        background-color: rgb(167 206 57) !important;
+        border-color: rgb(167 206 57) !important;
+      }
+
+      .login-container .card .card-body .form-group .input-group .form-control {
+        color: white !important;
+      }
+
+      .login-container .card .card-body .form-group .input-group {
+        border-bottom: 2px solid rgb(167 206 57) !important;
+        padding: 10px 0;
+      }
+
+      /* Para Chrome, Edge, Safari */
+      input::placeholder {
+        color: white !important;
+        opacity: 1; /* importante: los navegadores a veces aplican opacidad por defecto */
+      }
+
+      /* Para Firefox */
+      input::-moz-placeholder {
+        color: white !important;
+        opacity: 1;
+      }
+
+      /* Firefox (versiones antiguas, por consistencia) */
+      input::-moz-placeholder {
+        color: white !important;
+        opacity: 1;
+      }
+
+      /* Para IE/Edge (legacy) */
+      input:-ms-input-placeholder {
+        color: white !important;
+      }
+
+      /* Para Edge (legacy) */
+      input::-ms-input-placeholder {
+        color: white !important;
+      }
+
+      .login-container
+        .card
+        .card-body
+        .form-group
+        .input-group
+        .form-control:autofill {
+        transition: background-color 5000s ease-in-out 0s;
+        background-clip: content-box;
+        -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+        -webkit-text-fill-color: white !important;
+        caret-color: #a3a2a2;
+      }
+    </style>
+  </head>
+  <body class="am-splash-screen">
+    <div class="am-wrapper am-login">
+      <div class="am-content">
+        <div class="main-content">
+          <div class="login-container">
+            <div class="card">
+              <div class="card-header" style="margin-bottom: 0px">
+                <img
+                  class="logo-img img-fluid"
+                  src="static/img/logo_ecomisti2.png"
+                  alt="EcoMisti"
+                />
+              </div>
+              <div class="card-body">
+                <form method="post">
+                  <div class="login-form">
+                    <div style="text-align: center">
+                      <h1 style="color: rgb(167 206 57) !important">
+                        Portal de clientes
+                      </h1>
+                    </div>
+                    {% with messages =
+                    get_flashed_messages(with_categories=true) %} {% if messages
+                    %} {% for category, message in messages %}
+                    <div
+                      class="alert alert-{{ 'danger' if category == 'error' else ('warning' if category == 'warning' else 'success') }} alert-dismissible fade hide"
+                      role="alert"
+                    >
+                      {{ message }}
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                      ></button>
+                    </div>
+                    {% endfor %} {% endif %} {% endwith %}
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"
+                            ><i class="icon s7-user"></i
+                          ></span>
+                        </div>
+                        <input
+                          class="form-control"
+                          id="username"
+                          name="username"
+                          type="text"
+                          placeholder="RUC"
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"
+                            ><i class="icon s7-lock"></i
+                          ></span>
+                        </div>
+                        <input
+                          class="form-control"
+                          id="password"
+                          name="password"
+                          type="password"
+                          placeholder="Password"
+                        />
+                      </div>
+                    </div>
+                    <div class="form-group login-submit">
+                      <button
+                        class="btn btn-primary btn-lg btn-block"
+                        data-dismiss="modal"
+                        type="submit"
+                      >
+                        Ingresar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="static/lib/jquery/jquery.min.js"
+      type="text/javascript"
+    ></script>
+    <script
+      src="static/lib/perfect-scrollbar/js/perfect-scrollbar.min.js"
+      type="text/javascript"
+    ></script>
+    <script
+      src="static/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+      type="text/javascript"
+    ></script>
+    <script src="static/js/app.js" type="text/javascript"></script>
+    <script
+      src="static/lib/theme-switcher/theme-switcher.min.js"
+      type="text/javascript"
+    ></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        //- initialize the javascript
+        App.init();
+      });
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        App.livePreview();
+      });
+    </script>
+  </body>
+</html>
