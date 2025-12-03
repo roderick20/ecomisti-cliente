@@ -36,6 +36,7 @@
                   <th>Facturado</th>
                   <th>Año</th>
                   <th>Mes</th>
+                  <th>Fecha Programación</th>
                   <th>Fecha Recepción</th>
                   <th>Hora Ingreso</th>
                   <th>Hora Salida</th>
@@ -102,14 +103,9 @@
             return (
               '<a class="btn btn-sm btn-info editar-orden" title="Editar" href="/ordenes/update/' +
               row.UniqueId +
-              '"><i class="fa-solid fa-pen-to-square"></i></a> ' +
-              '<a class="btn btn-sm btn-info editar-orden"  title="Agregar productos" href="/ordenes/updateProductos/' +
-              row.UniqueId +
-              '"><i class="fa-solid fa-tag"></i></a> ' +
-              '<button class="btn btn-sm btn-danger eliminar-orden"><i class="fa-solid fa-trash"></i></button> ' +
-              '<a class="btn btn-sm btn-secondary" href="/ordenes/detail/' +
-              row.UniqueId +
-              '"> <i class="fa-solid fa-table-list"></i></a>'
+              '"><i class="fa-solid fa-pen-to-square"></i></a> ' 
+        
+              
             );
           },
           createdCell: function (td, cellData, rowData, row, col) {
@@ -120,10 +116,18 @@
         {
           data: "Estado",
           render: function (data, type, row) {
-            if (data == 0) {
-              return '<span class="badge bg-danger">Abierto</span>';
-            } else if (data == 1) {
+            //1 borrador, 2 enviado, 3 activo, 4 cerrado
+            if (data == 1) {
+              return '<span class="badge bg-danger">Borrador</span>';
+            } else if (data == 2) {
+              return '<span class="badge bg-info">Enviado</span>';
+            } else if (data == 3) {
+              return '<span class="badge bg-warning">En proceso</span>';
+            } else if (data == 4) {
               return '<span class="badge bg-success">Cerrado</span>';
+            }
+            else{
+              return data;
             }
           },
         },
@@ -139,6 +143,7 @@
         },
         { data: "Anyo" },
         { data: "Mes" },
+        { data: "FechaProgramacion" },
         { data: "FechaRecepcion" },
         { data: "HoraIngreso" },
         { data: "HoraSalida" },

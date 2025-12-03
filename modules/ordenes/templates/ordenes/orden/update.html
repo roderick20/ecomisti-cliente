@@ -1,82 +1,272 @@
-<!-- templates/productos/form.html -->
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Agregar orden{% endblock %} {% block content %}
+<div class="main-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Orden de Servicio</h5>
+                </div>
+                <div class="card-body">
+                    <input type="hidden" id="uniqueId" value="{{order.UniqueId}}" />
 
-{% block title %}{{ "Editar" if producto else "Nuevo" }} Producto{% endblock %}
+                    <form id="formCreate" method="post">
+                        <label class="form-label" style="margin-bottom: 0px">EO-RS Transportista</label>
+                        <hr style="margin-top: 0px" />
+                        <div class="row mb-1">
+                            <div class="col-md-4">
+                                <label class="form-label">RUC</label>
+                                <input id="" class="form-control form-control-sm" value="{{session_username}}" disabled />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Razón Social<span class="text-danger">*</span></label>
+                                <input id="" class="form-control form-control-sm" value="{{session_nombre}}" disabled />
+                            </div>
 
-{% block content %}
-<div class="row mb-2 mb-xl-3">
-    <div class="col-auto d-none d-sm-block">
-        <h3>Agregar Producto</h3>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <form method="POST">
-
-                     <input type="hidden" id="uniqueid" name="uniqueid" value="{{ tarea.uniqueid if tarea else '' }}" required>
-
-                    <div class="mb-3">
-                        <label for="titulo" class="form-label">Título <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="titulo" name="titulo" value="{{ tarea.titulo if tarea else '' }}" required>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label for="fecha_inicio" class="form-label">Fecha Inicio <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ tarea.fecha_inicio.strftime('%Y-%m-%d') if tarea else '' }}" required>
+                            <div class="col-md-2">
+                                <label class="form-label">Tracto<span class="text-danger">*</span></label>
+                                <input id="Placa_Tracto" class="form-control form-control-sm" value="{{order.Placa_Tracto}}" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label for="Placa_Carreta" class="form-label">Carreta<span class="text-danger">*</span></label>
+                                <input id="Placa_Carreta" class="form-control form-control-sm" value="{{order.Placa_Carreta}}" disabled />
+                            </div>
                         </div>
+                        <label class="form-label" style="margin-bottom: 0px; margin-top: 20px">Gestor del servicio</label>
+                        <hr style="margin-top: 0px" />
+                        <div class="row mb-1">
+                            <div class="col-md-4">
+                                <label class="form-label">RUC</label>
+                                <input id="Placa_Carreta" class="form-control form-control-sm" value="" disabled />
+                            </div>
 
-                        <div class="col-6 mb-3">
-                            <label for="fecha_fin" class="form-label">Fecha Fin <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ tarea.fecha_fin.strftime('%Y-%m-%d') if tarea else '' }}" required>
+                            <div class="col-md-4">
+                                <label class="form-label">Razón Social<span class="text-danger">*</span></label>
+                                <input id="TransportistaId" class="form-control form-control-sm" value="" disabled />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Dirección<span class="text-danger">*</span></label>
+                                <input id="TransportistaId" class="form-control form-control-sm" value="" disabled />
+                            </div>
                         </div>
-                    </div>
+                        <div class="row mb-1">
+                            <div class="col-md-2">
+                                <label class="form-label">Fecha de Programación</label>
+                                <input id="FechaProgramacion" name="FechaProgramacion" type="text" class="form-control form-control-sm" value="{{order.FechaProgramacion or ''}}" disabled />
+                            </div>
 
-                    <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="descripcion" name="descripcion">{{ tarea.descripcion if tarea else '' }}</textarea>
-                    </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Conductor Nombre</label>
+                                <input id="ConductorNombre" name="ConductorNombre" class="form-control form-control-sm" value="{{order.ConductorNombre}}" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Conductor Licencia</label>
+                                <input id="ConductorLicencia" name="ConductorLicencia" class="form-control form-control-sm" value="{{order.ConductorLicencia}}" disabled />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Items</h5>
+                </div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-primary float-end mb-2" onclick="openDialogAdd()">
+                        <i class="fa-solid fa-plus"></i> Agregar
+                    </button>
+                    
+                    <table id="tblData" class="table table-sm  table-bordered " style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Guía de Remisión</th>
+                                <th>Guía de Transportista</th>
+                                <th>Cliente</th>
+                                <th>Fuente Generación</th>
+                                <th>Manifiesto Código</th>
+                                <th>Código de Basilea</th>
+                                <th>Peso(Kg)</th>
+                                <th>Volumen</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('task.task_index') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Grabar
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="formModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="display: none;">
+                <h3 class="modal-title">Form Modal</h3>
+                <button class="close md-close" data-dismiss="modal" aria-hidden="true"><i class="icon s7-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <label for="GuiaTransportista" class="form-label">Generador RUC</label>
+                            <div class="input-group mb-3">
+                                <input class="form-control form-control-sm" type="text" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary btn-sm"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="Tipo">Generador<span class="text-danger">*</span></label>
+                            <select class="form-control form-control-sm" id="ClienteId">
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FuenteGeneracion">Fuente Generación</label>
+                            <select class="form-control form-control-sm" id="ClienteDireccionId">
+                            </select>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="GuiaRemision" class="form-label">Guía de Remisión</label>
+                            <input id="GuiaRemision" class="form-control form-control-sm ">
+                        </div>
+                        <div class="mb-2">
+                            <label for="GuiaTransportista" class="form-label">Guía del Transportista</label>
+                            <input id="GuiaTransportista" class="form-control form-control-sm">
+                        </div>
+
+
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <label class="form-label" for="Peso">Peso(Kg)</label>
+                            <input type="text" class="form-control form-control-sm" id="Peso" autocomplete="off" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="Volumen">Volumen</label>
+                            <input type="text" class="form-control form-control-sm" id="Volumen" autocomplete="off" />
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label" for="Codigo">Código de Basilea</label>
+                            <input type="text" class="form-control form-control-sm" id="Codigo" autocomplete="off" />
+                        </div>
+
+
+
+                        <div class="mb-2">
+                            <label class="form-label" for="Descripcion">Descripción</label>
+                            <input type="text" class="form-control form-control-sm" id="Descripcion" />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal" onclick="$('#formModal').modal('hide')">Cancel</button>
+                <button class="btn btn-success" id="btnSave" data-dismiss="modal" onclick="saveOrderServicio()">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 {% block scripts %}
-<link href="/static/datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
-<script src="/static/datepicker/js/bootstrap-datepicker.min.js"></script>
-<script src="/static/datepicker/locales/bootstrap-datepicker.es.min.js"></script>
+
+
 <script>
 
-    // Establecer la fecha actual en el campo
-    const hoy = new Date().toISOString().split('T')[0]; // Formato: "yyyy-mm-dd"
-    document.getElementById('fecha_inicio').value = hoy;
 
-    $('#fecha_inicio').datepicker({
-        format: "yyyy-mm-dd",
-        language: "es",
-        autoclose: true,
-        todayHighlight: true
-    });
+    function openDialogAdd() {
+        $('#formModal').modal('show');
+    }
 
-    $('#fecha_fin').datepicker({
-        format: "yyyy-mm-dd",
-        language: "es",
-        autoclose: true,
-        todayHighlight: true
+    details();
+
+    async function details() {
+        try {
+            const result = await $.ajax({
+                url: `/ordenes/getordenservices/${$("#uniqueId").val()}`,
+                type: 'GET',
+                dataType: 'json'
+            });
+            $("#tblData tbody").html('');
+
+            for (let i = 0; i < result.length; i++) {
+                let servicio = result[i];
+                let td = "<td></td>";
+
+                $("#tblData tbody").append(`<tr>
+                    <td>${servicio.Item}</td>
+                    <td>${servicio.GuiaRemision}</td>
+                    <td>${servicio.GuiaTransportista}</td>
+                    <td>${servicio.Personeria}</td>
+                    <td>${servicio.Direccion}</td>
+                    <td>${servicio.ManifiestoCodigo}</td>
+                    <td>${servicio.Codigo}</td>
+                    <td>${servicio.Peso}</td>
+                    <td>${servicio.Volumen}</td>
+                    <td>${servicio.Descripcion}</td>
+                    </tr>`);
+            }
+
+
+        } catch (error) {
+            console.error('Error al obtener las columnas:', error);
+            alert('Error al obtener las columnas: ' + error.responseText || error.statusText);
+        }
+    }
+
+
+    function saveOrderServicio() {
+        $('#btnSave').html('<i class="fas fa-spinner fa-spin"></i>');
+        var entity = {
+            UniqueId: $('#uniqueId').val() || "",
+            GuiaRemision: $('#GuiaRemision').val() || "",
+            GuiaTransportista: $('#GuiaTransportista').val() || "",
+            Peso: $('#Peso').val() || "0",
+            Volumen: $('#Volumen').val() || "0",
+            Codigo: $('#Codigo').val() || "",
+            Descripcion: $('#Descripcion').val() || "",
+        };
+
+        $.ajax({
+            url: '/ordenes/addservice',
+            type: 'POST',
+            //contentType: 'application/json',
+            //data: JSON.stringify(entity),
+            data: entity,
+            success: async function (result) {
+                details();
+                $('#btnSave').html('<i class="fa-solid fa-cloud-arrow-up"></i> Grabar');
+                $('#formModal').modal('hide');
+
+            },
+            error: function (xhr, status, error) {
+                alert('Error al guardar: ' + error);
+            }
+        });
+    }
+
+
+    document.getElementById('formCreate').addEventListener('submit', function (e) {
+        // Verifica si el formulario es válido (usa la validación nativa del navegador)
+        console.log(this.checkValidity());
+        if (!this.checkValidity()) {
+            // Si no es válido, no hacemos nada; el navegador ya muestra el mensaje
+            return;
+        }
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const icon = submitBtn.querySelector('i');
+        // Si es válido, desactivamos el botón y mostramos el spinner
+        submitBtn.classList.add('disabled');
+        submitBtn.style.pointerEvents = 'none';
+        icon.className = 'fa-solid fa-spinner fa-spin';
     });
 </script>
 {% endblock %}

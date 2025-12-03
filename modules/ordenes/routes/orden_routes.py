@@ -20,15 +20,30 @@ def orden_get_table():
         except Exception as error:
             print(error)
 
-@bp.route('/getplacas', methods=['POST'])
-def orden_get_placas():
-    print(request)
-    if request.method == 'POST':
-        try:
-            result = OrdenModel.get_placa_personeria_id(request.form)
-            return jsonify(result)             
-        except Exception as error:
-            print(error)
+# @bp.route('/getplacas', methods=['POST'])
+# def orden_get_placas():
+#     print(request)
+#     if request.method == 'POST':
+#         try:
+#             result = OrdenModel.get_placa_personeria_id(request.form)
+#             return jsonify(result)             
+#         except Exception as error:
+#             print(error)
+@bp.route('/getordenservices/<string:uniqueid>', methods=['GET'])
+def orden_getordenservices(uniqueid):   
+    try:
+        result = OrdenModel.get_ordenservice_by_uniqueid(uniqueid)
+        return jsonify(result)             
+    except Exception as error:
+        print(error)
+
+@bp.route('/addservice', methods=['POST'])
+def orden_addservice():
+    try:
+        result = OrdenModel.addservice(request.form)
+        return jsonify(result)             
+    except Exception as error:
+        print(error)
 
 @bp.route('/getdirecciones', methods=['POST'])
 def orden_get_direcciones():   
@@ -41,10 +56,16 @@ def orden_get_direcciones():
 
 @bp.route('/create', methods=['GET', 'POST'])
 def orden_create():  
-    #if request.method == 'POST':  
+    if request.method == 'POST':  
+        result = OrdenModel.create(request.form)
+        return redirect(url_for('.orden_list'))
     placas = OrdenModel.get_placa_personeria_id(session.get('user_id'))
-    return render_template('/ordenes/orden/create.html', 
-                           placas = placas)
+    return render_template('/ordenes/orden/create.html', placas = placas)
+
+@bp.route('/update/<string:uniqueid>', methods=['GET', 'POST'])
+def orden_update(uniqueid):  
+    result = OrdenModel.get_orden_by_uniqueid(uniqueid)
+    return render_template('/ordenes/orden/update.html', order = result)
 
 @bp.route('/searchclient')
 def search_client():

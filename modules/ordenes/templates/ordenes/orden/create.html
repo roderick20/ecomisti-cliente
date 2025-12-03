@@ -7,7 +7,7 @@
                     <h5 class="card-title mb-0">Nueva Orden de Servicio</h5>
                 </div>
                 <div class="card-body">
-                    <form id="createForm" asp-action="Create" asp-controller="OrdenServicio" method="post">
+                    <form id="formCreate" method="post">
                         <label class="form-label" style="margin-bottom: 0px">EO-RS Transportista</label>
                         <hr style="margin-top: 0px" />
                         <div class="row mb-1">
@@ -22,7 +22,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label">Tracto<span class="text-danger">*</span></label>
-                                <select id="Placa_Tracto" class="form-control form-control-sm">
+                                <select id="Placa_Tracto" name="Placa_Tracto" class="form-control form-control-sm">
                                     {% if placas %} {% for item in placas %}
                                     <option value="{{ item.Placa }}">{{ item.Placa }}</option>
                                     {% endfor %} {% endif %}
@@ -30,7 +30,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label for="Placa_Carreta" class="form-label">Carreta<span class="text-danger">*</span></label>
-                                <select id="Placa_Carreta" class="form-control form-control-sm">
+                                <select id="Placa_Carreta" name="Placa_Carreta" class="form-control form-control-sm">
                                     {% if placas %} {% for item in placas %} {% if item.Carreta and item.Carreta.strip() != '' %}
                                     <option value="{{ item.Carreta }}">{{ item.Carreta }}</option>
                                     {% endif %} {% endfor %} {% endif %}
@@ -61,17 +61,17 @@
                         </div>
                         <div class="row mb-1">
                             <div class="col-md-2">
-                                <label class="form-label">Fecha Recepción</label>
-                                <input id="FechaRecepcion" type="text" class="form-control form-control-sm" data-mask="00/00/0000" placeholder="DD/MM/AAAA" />
+                                <label class="form-label">Fecha de Programación</label>
+                                <input id="FechaProgramacion" name="FechaProgramacion" type="text" class="form-control form-control-sm" placeholder="DD/MM/AAAA" />
                             </div>
 
                             <div class="col-md-2">
                                 <label class="form-label">Conductor Nombre</label>
-                                <input id="ConductorNombre" class="form-control form-control-sm" />
+                                <input id="ConductorNombre" name="ConductorNombre" class="form-control form-control-sm" />
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Conductor Licencia</label>
-                                <input id="ConductorLicencia" class="form-control form-control-sm" />
+                                <input id="ConductorLicencia" name="ConductorLicencia" class="form-control form-control-sm" />
                             </div>
                         </div>
 
@@ -80,7 +80,7 @@
                                 <a href="/ordenes" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Regresar</a>
                             </div>
                             <div class="col-6" style="text-align: right">
-                                <button type="button" id="btnSave" class="btn btn-primary float-end" onclick="save()"><i class="fa-solid fa-cloud-arrow-up"></i> Grabar</button>
+                                <button type="submit" id="btnSave" class="btn btn-primary float-end" onclick="save()"><i class="fa-solid fa-cloud-arrow-up"></i> Grabar</button>
                             </div>
                         </div>
                     </form>
@@ -89,7 +89,32 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<link id="bsdp-css" href="/static/lib/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+<script src="/static/lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js" charset="UTF-8"></script>
+<script src="/static/lib/bootstrap-datepicker/locales/bootstrap-datepicker.es.min.js" charset="UTF-8"></script>
 
-{% endblock %} {% block scripts %}
+<script>
+    $('#FechaProgramacion').datepicker({
+        format: "dd/mm/yyyy",
+        language: "es",
+        autoclose: true
+    });
 
+    document.getElementById('formCreate').addEventListener('submit', function(e) {
+    // Verifica si el formulario es válido (usa la validación nativa del navegador)
+    console.log(this.checkValidity());
+    if (!this.checkValidity()) {
+      // Si no es válido, no hacemos nada; el navegador ya muestra el mensaje
+      return;
+    }
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const icon = submitBtn.querySelector('i');
+    // Si es válido, desactivamos el botón y mostramos el spinner
+    submitBtn.classList.add('disabled');
+    submitBtn.style.pointerEvents = 'none';
+    icon.className = 'fa-solid fa-spinner fa-spin';
+  });
+</script>
 {% endblock %}
