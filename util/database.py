@@ -45,7 +45,10 @@ class Database:
             # Pero solo si hiciste un INSERT con IDENTITY
             # Si no necesitas el ID, puedes omitir esto o devolver None
             # Alternativa: no devolver lastrowid (pymssql no lo soporta directamente)
-            return None  # O ajusta según tu lógica
+
+            row = cursor.fetchone()
+
+            return row  # O ajusta según tu lógica
         except Exception as e:
             print(f"Error ejecutando query: {e}")
             connection.rollback()

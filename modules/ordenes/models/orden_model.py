@@ -21,8 +21,9 @@ class OrdenModel:
     
     @staticmethod
     def get_ordenservice_by_uniqueid(uniqueid):
-        query = '''SELECT ordser.* FROM [dbo].[OrdenServicio] ordser
-                LEFT JOIN [dbo].[Orden] ord ON ord.Id = ordser.OrdenId
+        query = '''SELECT ordser.*, per.* FROM [dbo].[OrdenServicio] ordser
+LEFT JOIN [dbo].[Orden] ord ON ord.Id = ordser.OrdenId
+LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
                 WHERE ord.uniqueid = %s'''
         data_result =  db.query(query,(uniqueid,))
         data_dict = [row._asdict() for row in data_result] if data_result else []
@@ -70,12 +71,14 @@ class OrdenModel:
             'TransportistaId' :  user_id,
             'Placa_Tracto' :  form_data.get('Placa_Tracto', '').strip(),
             'Placa_Carreta' : form_data.get('Placa_Carreta', '').strip(),
-            'TransportistaServicioId' :  1, #form_data.get('TransportistaServicioId', '').strip()
+            'TransportistaServicioId' :  form_data.get('TransportistaServicioId', '').strip(),
             'ConductorLicencia' :  form_data.get('ConductorLicencia', '').strip(),
             'ConductorNombre' :  form_data.get('ConductorNombre', '').strip(),
             'Estado' : 1,
             'Author' : user_id
             }
+
+            print(values)
 
             query = '''
                 INSERT INTO [dbo].[Orden] 
@@ -116,7 +119,8 @@ class OrdenModel:
             'Codigo' :  form_data.get('Codigo', '').strip(),
             'Descripcion' :  form_data.get('Descripcion', '').strip(),
             'Author' : user_id,
-            'OrdenId': result[0].Id
+            'OrdenId': result[0].Id,
+            'ClienteId':  form_data.get('ClienteId', '').strip(),
             }
 
 
@@ -125,12 +129,12 @@ class OrdenModel:
                 (GuiaRemision, 
                 GuiaTransportista, Peso, Volumen, 
                 Codigo,  
-                Descripcion, OrdenId, Author)
+                Descripcion, OrdenId, Author, ClienteId)
                 VALUES 
                 (%(GuiaRemision)s, 
                 %(GuiaTransportista)s, %(Peso)s, %(Volumen)s, 
                 %(Codigo)s,
-                %(Descripcion)s, %(OrdenId)s, %(Author)s);
+                %(Descripcion)s, %(OrdenId)s, %(Author)s, %(ClienteId)s);
             '''
             data = db.execute(query, ( values ))
             print(data)
@@ -188,7 +192,7 @@ class OrdenModel:
                     os.[Mes],
                     os.[Estado],
                     os.[Facturado],
-                    FORMAT(os.[FechaRecepcion], 'dd-MM-yyyy') AS FechaRecepcion,
+                    FORMAT(os.[FechaRecepcion], 'yyyy-MM-dd') AS FechaRecepcion,
                     FORMAT(os.[HoraIngreso], 'HH:mm') AS HoraIngreso,
                     FORMAT(os.[HoraSalida], 'HH:mm') AS HoraSalida,
                     os.[Created],
@@ -201,7 +205,7 @@ class OrdenModel:
                     os.[TransportistaServicioId],
                     os.[Placa_TractoServicio],
                     os.[Placa_CarretaServicio],
-                    FORMAT(os.[FechaProgramacion], 'HH:mm') AS FechaProgramacion,
+                    FORMAT(os.[FechaProgramacion], 'yyyy-MM-dd') AS FechaProgramacion,
                     tr.[Personeria] AS TransportistaName
                 FROM [Orden] os
                 LEFT JOIN [Personeria] tr ON os.TransportistaId = tr.PersoneriaID
@@ -225,3 +229,70 @@ class OrdenModel:
         except Exception as error:
             print("Error en TareaModel.create:", error)
             return {"success": False, "error": str(error)}
+        
+    @staticmethod
+    def get_by_numero_doc(numero_doc):
+        try:
+            query = """
+                SELECT  *
+                FROM [dbo].[Personeria] 
+                WHERE NroIdentidad =  %s
+            """
+            data = db.query(query,(numero_doc,))
+            return { "success": True, "data": data }
+        except Exception as error:
+            return { "success": False, "error": str(error) }   
+        
+
+    @staticmethod
+    def create_ruc(razon_social, numero_doc, direccion, ubigeo):
+        print('create_ruc')
+        try:
+            creado_por = session['user_id']            
+            query = """
+                INSERT INTO personeria
+                    (Personeria, NombreComercial, TipoIdentidadID, NroIdentidad, GrupoPersoneria, Domiciliado,TipoContribuyente,FamiliaID,NegocioID,CtaDetraccion,Codigo,Estado,UsuarioID,ConvenioID,MedioRegistroID,MedioInformacionID,Referencia,Telefonos,mail)
+                VALUES( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  
+            """
+            data = db.execute(query, ( razon_social, razon_social, '203.00002', numero_doc, '101000', 1, 0,'143.00000','179.00000','','',1,1,'902.00001','900.00001','901.00002',''))
+            print(data)
+            return { "success": True, "data": data }
+        except Exception as error:
+            print(error)
+            return { "success": False, "error": str(error) }
+
+    @staticmethod
+    def create_dni(razon_social, numero_doc):
+        try:
+            #razon_social = form_data.get('razon_social', '').strip()
+            nombre_comercial =  ''# form_data.get('nombre_comercial', '').strip()
+            tipo_doc = 1 #form_data.get('tipo_doc', '').strip()
+            
+            #numero_doc =  form_data.get('numero_doc', '').strip()
+            personeria_tipo = 1 #form_data.get('personeria_tipo', '').strip()
+            contacto =   ''#form_data.get('contacto', '').strip()
+            telefono =  ''#form_data.get('telefono', '').strip()
+            email =  ''# form_data.get('email', '').strip()
+            cuenta_detraccion =  ''#form_data.get('cuenta_detraccion', '').strip()
+            cuenta_cci =  ''#form_data.get('cuenta_cci', '').strip()
+
+            direccion = ''
+            ubigeo =  ''
+
+            creado_por = session['user_id']            
+            query = """
+                INSERT INTO personeria
+                    (razon_social, nombre_comercial, tipo_doc, numero_doc,
+                    personeria_tipo, contacto, telefono, email,
+                    cuenta_detraccion, cuenta_cci, direccion, ubigeo, creado_por)
+                VALUES( %s, %s, %s, %s,
+                        %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s)  
+            """
+            data = db.execute(query, ( razon_social, nombre_comercial, tipo_doc, numero_doc, 
+                                       personeria_tipo, contacto, telefono, email,
+                                       cuenta_detraccion, cuenta_cci, direccion, ubigeo, creado_por))
+            return { "success": True, "data": data }
+        except Exception as error:
+            print(error)
+            return { "success": False, "error": str(error) }

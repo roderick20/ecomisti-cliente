@@ -43,26 +43,26 @@
                             <div class="col-md-4">
                                 <label class="form-label">RUC</label>
                                 <div class="input-group mb-3">
-                                    <input class="form-control form-control-sm" type="text" />
+                                    <input class="form-control form-control-sm" id="numero_doc_gestor" type="text" />
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                                        <button class="btn btn-primary btn-sm"  onclick="buscarPersona()" ><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
                                     </div>
                                 </div>
                             </div>
-
+                            <input id="TransportistaServicioId" class="form-control form-control-sm" type="hidden"/>
                             <div class="col-md-4">
                                 <label class="form-label">Razón Social<span class="text-danger">*</span></label>
-                                <input id="TransportistaId" class="form-control form-control-sm" disabled />
+                                <input class="form-control form-control-sm" disabled  id="razon_social_gestor"/>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" style="display: none;">
                                 <label class="form-label">Dirección<span class="text-danger">*</span></label>
-                                <input id="TransportistaId" class="form-control form-control-sm" />
+                                <input class="form-control form-control-sm"  id="direccion_gestor"/>
                             </div>
                         </div>
                         <div class="row mb-1">
                             <div class="col-md-2">
                                 <label class="form-label">Fecha de Programación</label>
-                                <input id="FechaProgramacion" name="FechaProgramacion" type="text" class="form-control form-control-sm" placeholder="DD/MM/AAAA" />
+                                <input id="FechaProgramacion" name="FechaProgramacion" type="text" class="form-control form-control-sm" placeholder="AAAA-MM-DD" />
                             </div>
 
                             <div class="col-md-2">
@@ -97,7 +97,7 @@
 
 <script>
     $('#FechaProgramacion').datepicker({
-        format: "dd/mm/yyyy",
+        format: "yyyy-mm-dd",
         language: "es",
         autoclose: true
     });
@@ -116,5 +116,49 @@
     submitBtn.style.pointerEvents = 'none';
     icon.className = 'fa-solid fa-spinner fa-spin';
   });
+
+  
+    async function buscarPersona() {
+        //const tipoDoc = document.getElementById("tipo_doc").value;
+        const numeroDoc = document.getElementById("numero_doc_gestor").value.trim();
+        const boton = document.querySelector('button[onclick="buscarPersona()"]');
+
+        if (!numeroDoc) {
+            alert("Por favor ingresa un número de documento.");
+            return;
+        }
+
+        const textoOriginal = boton.innerHTML;
+
+        // Activar estado de carga
+        boton.disabled = true;
+        boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> '; // o usa un spinner si tienes
+
+        let url = `/ordenes/search_ruc/${numeroDoc}`;
+       
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+                //if ($("#serie_id option:selected").text().trim().startsWith("Factura")) {
+                $("#razon_social_gestor").val(data.razon_social);
+                $("#TransportistaServicioId").val(data.personeria_id);
+
+            } else {
+                // Manejar respuesta con error (ej: 404, DNI no encontrado)
+                alert("No se encontró información para el documento ingresado.");
+            }
+        } catch (error) {
+            console.error("Error en la búsqueda:", error);
+            alert("Ocurrió un error al buscar. Inténtalo de nuevo.");
+        } finally {
+            // Siempre restaurar el botón, incluso si hay error
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    }
+
+
 </script>
 {% endblock %}

@@ -83,7 +83,7 @@
                                 <th>Guía de Transportista</th>
                                 <th>Cliente</th>
                                 <th>Fuente Generación</th>
-                                <th>Manifiesto Código</th>
+                                {# <th>Manifiesto Código</th> #}
                                 <th>Código de Basilea</th>
                                 <th>Peso(Kg)</th>
                                 <th>Volumen</th>
@@ -113,21 +113,20 @@
                         <div class="mb-2">
                             <label for="GuiaTransportista" class="form-label">Generador RUC</label>
                             <div class="input-group mb-3">
-                                <input class="form-control form-control-sm" type="text" />
+                                <input class="form-control form-control-sm" id="numero_doc" type="text" />
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary btn-sm"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                                    <button class="btn btn-primary btn-sm"  onclick="buscarPersona()" ><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
+                        <input id="ClienteId"  name="ClienteId" class="form-control form-control-sm" type="hidden"/>
                         <div class="mb-2">
                             <label class="form-label" for="Tipo">Generador<span class="text-danger">*</span></label>
-                            <select class="form-control form-control-sm" id="ClienteId">
-                            </select>
+                            <input class="form-control form-control-sm" type="text" id="generador_name" />
                         </div>
                         <div class="mb-2">
                             <label class="form-label" for="FuenteGeneracion">Fuente Generación</label>
-                            <select class="form-control form-control-sm" id="ClienteDireccionId">
-                            </select>
+                            <input class="form-control form-control-sm" type="text" />
                         </div>
 
                         <div class="mb-2">
@@ -202,17 +201,17 @@
                 let td = "<td></td>";
 
                 $("#tblData tbody").append(`<tr>
-                    <td>${servicio.Item}</td>
+                    <td>${i+1}</td>
                     <td>${servicio.GuiaRemision}</td>
                     <td>${servicio.GuiaTransportista}</td>
                     <td>${servicio.Personeria}</td>
                     <td>${servicio.Direccion}</td>
-                    <td>${servicio.ManifiestoCodigo}</td>
+                    
                     <td>${servicio.Codigo}</td>
                     <td>${servicio.Peso}</td>
                     <td>${servicio.Volumen}</td>
                     <td>${servicio.Descripcion}</td>
-                    </tr>`);
+                    </tr>`);//<td>${servicio.ManifiestoCodigo}</td>
             }
 
 
@@ -233,6 +232,7 @@
             Volumen: $('#Volumen').val() || "0",
             Codigo: $('#Codigo').val() || "",
             Descripcion: $('#Descripcion').val() || "",
+            ClienteId: $('#ClienteId').val() || "",
         };
 
         $.ajax({
@@ -268,5 +268,52 @@
         submitBtn.style.pointerEvents = 'none';
         icon.className = 'fa-solid fa-spinner fa-spin';
     });
+
+  
+    async function buscarPersona() {
+        //const tipoDoc = document.getElementById("tipo_doc").value;
+        const numeroDoc = document.getElementById("numero_doc").value.trim();
+        const boton = document.querySelector('button[onclick="buscarPersona()"]');
+
+        if (!numeroDoc) {
+            alert("Por favor ingresa un número de documento.");
+            return;
+        }
+
+        const textoOriginal = boton.innerHTML;
+
+        // Activar estado de carga
+        boton.disabled = true;
+        boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> '; // o usa un spinner si tienes
+
+        let url = `/ordenes/search_ruc/${numeroDoc}`;
+       
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+                //if ($("#serie_id option:selected").text().trim().startsWith("Factura")) {
+                $("#generador_name").val(data.razon_social);
+                $("#ClienteId").val(data.personeria_id);
+
+            } else {
+                // Manejar respuesta con error (ej: 404, DNI no encontrado)
+                alert("No se encontró información para el documento ingresado.");
+            }
+        } catch (error) {
+            console.error("Error en la búsqueda:", error);
+            alert("Ocurrió un error al buscar. Inténtalo de nuevo.");
+        } finally {
+            // Siempre restaurar el botón, incluso si hay error
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    }
+
+
+
+
+
 </script>
 {% endblock %}
