@@ -82,7 +82,8 @@ def search_ruc(numero):
     if len(personeria['data']) == 1 :        
         return jsonify({
             "razon_social": personeria['data'][0].Personeria,
-            "personeria_id": personeria['data'][0].PersoneriaID
+            "personeria_id": personeria['data'][0].PersoneriaID,
+            "direcciones": personeria['direccion']
         })
     
     else:
@@ -108,17 +109,8 @@ def search_ruc(numero):
             print(personeria['data'])
             return jsonify({
                 "razon_social": empresa.get("razon_social", ""),
-                # "tipoDocumento": empresa.get("TipoIdentidadID", ""),
-                # "numeroDocumento": empresa.get("numero_documento", numero),
-                # #"GrupoPersoneria": empresa.get("GrupoPersoneria", ""),
-                # "estado": empresa.get("estado", ""),
-                # "condicion": empresa.get("condicion", ""),
-                # "direccion": empresa.get("direccion", ""),
-                # "ubigeo": empresa.get("ubigeo", ""),
-                # "viaTipo": empresa.get("viaTipo", ""),
-                # "viaNombre": empresa.get("viaNombre", ""),
-                # "zonaCodigo": empresa.get("zonaCodigo", ""),
-                "personeria_id": personeria['data']
+                "personeria_id": personeria['PersoneriaID'],
+                "direcciones": personeria['data']
             })
 
         except Exception as e:

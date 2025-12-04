@@ -239,27 +239,151 @@ LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
                 WHERE NroIdentidad =  %s
             """
             data = db.query(query,(numero_doc,))
-            return { "success": True, "data": data }
+
+            query = """
+                SELECT [DireccionID], [Direccion]
+                FROM [dbo].[PersoneriaDireccion] 
+                WHERE PersoneriaID =  %s
+            """
+            direccion = db.query(query,(data[0].PersoneriaID,))
+
+            return { "success": True, "data": data, "direccion":direccion }
         except Exception as error:
             return { "success": False, "error": str(error) }   
         
+
+    # @staticmethod
+    # def create_ruc(razon_social, numero_doc, direccion, ubigeo):
+    #     print('create_ruc')
+    #     try:
+    #         creado_por = session['user_id']            
+    #         query = """
+    #             INSERT INTO personeria
+    #                 (Personeria, NombreComercial, TipoIdentidadID, NroIdentidad, GrupoPersoneria, Domiciliado,TipoContribuyente,FamiliaID,NegocioID,CtaDetraccion,
+    #                 Codigo,Estado,UsuarioID,ConvenioID,MedioRegistroID,MedioInformacionID,Referencia,Telefonos,email)
+    #             VALUES( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+    #                     %s, %s, %s, %s, %s, %s, %s, %s, %s)  
+    #         """
+    #         data = db.execute(query, ( 
+    #             razon_social, razon_social, '203.00002', numero_doc, '101000', 1, 0,'143.00000','179.00000','',
+    #             '',1,1,'902.00001','900.00001','901.00002','','',''))
+    #         print(data)
+    #         return { "success": True, "data": data }
+    #     except Exception as error:
+    #         print(error)
+    #         return { "success": False, "error": str(error) }
 
     @staticmethod
     def create_ruc(razon_social, numero_doc, direccion, ubigeo):
         print('create_ruc')
         try:
-            creado_por = session['user_id']            
+            creado_por = session['user_id']
+
             query = """
-                INSERT INTO personeria
-                    (Personeria, NombreComercial, TipoIdentidadID, NroIdentidad, GrupoPersoneria, Domiciliado,TipoContribuyente,FamiliaID,NegocioID,CtaDetraccion,Codigo,Estado,UsuarioID,ConvenioID,MedioRegistroID,MedioInformacionID,Referencia,Telefonos,mail)
-                VALUES( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  
+                INSERT INTO personeria (
+                    Personeria, NombreComercial, TipoIdentidadID, NroIdentidad, 
+                    GrupoPersoneria, Domiciliado, TipoContribuyente, FamiliaID, 
+                    NegocioID, CtaDetraccion, Codigo, Estado, UsuarioID, ConvenioID, 
+                    MedioRegistroID, MedioInformacionID, Referencia, Telefonos, email
+                )
+                
+                VALUES (
+                    %(Personeria)s, %(NombreComercial)s, %(TipoIdentidadID)s, %(NroIdentidad)s,
+                    %(GrupoPersoneria)s, %(Domiciliado)s, %(TipoContribuyente)s, %(FamiliaID)s,
+                    %(NegocioID)s, %(CtaDetraccion)s, %(Codigo)s, %(Estado)s, %(UsuarioID)s, %(ConvenioID)s,
+                    %(MedioRegistroID)s, %(MedioInformacionID)s, %(Referencia)s, %(Telefonos)s, %(email)s
+                );
             """
-            data = db.execute(query, ( razon_social, razon_social, '203.00002', numero_doc, '101000', 1, 0,'143.00000','179.00000','','',1,1,'902.00001','900.00001','901.00002',''))
-            print(data)
-            return { "success": True, "data": data }
+
+            params = {
+                'Personeria': razon_social,
+                'NombreComercial': razon_social,
+                'TipoIdentidadID': '203.00002',
+                'NroIdentidad': numero_doc,
+                'GrupoPersoneria': '101000',
+                'Domiciliado': 1,
+                'TipoContribuyente': 0,
+                'FamiliaID': '143.00000',
+                'NegocioID': '179.00000',
+                'CtaDetraccion': '',
+                'Codigo': '',
+                'Estado': 1,
+                'UsuarioID': 1,
+                'ConvenioID': '902.00001',
+                'MedioRegistroID': '900.00001',
+                'MedioInformacionID': '901.00002',
+                'Referencia': direccion or '',
+                'Telefonos': '',
+                'email': ''
+            }
+
+            db.execute(query, params)
+            #-------------------------------------------------
+            query = """
+                SELECT  *
+                FROM [dbo].[Personeria] 
+                WHERE NroIdentidad =  %s
+            """
+            data = db.query(query,(numero_doc,))
+            #------------------------------------------------
+            query = """
+                INSERT INTO [dbo].[PersoneriaDireccion] (
+                    [PersoneriaID],[DireccionID],[PaisID],[UbicacionID],[ViaID]
+                    ,[NombreVia],[NumeroVia],[InteriorVia],[ZonaID],[NombreZona]
+                    ,[Direccion],[Telefonos],[Email],[ZonaRutaID],[Secuencia]
+                    ,[Coordenada],[Estado],[UsuarioID]
+                )
+                
+                VALUES (
+                    %(PersoneriaID)s,%(DireccionID)s,%(PaisID)s,%(UbicacionID)s,%(ViaID)s
+                    ,%(NombreVia)s,%(NumeroVia)s,%(InteriorVia)s,%(ZonaID)s,%(NombreZona)s
+                    ,%(Direccion)s,%(Telefonos)s,%(Email)s,%(ZonaRutaID)s,%(Secuencia)s
+                    ,%(Coordenada)s,%(Estado)s,%(UsuarioID)s
+                );
+            """
+            PersoneriaID = data[0].PersoneriaID
+            params = {
+                'PersoneriaID': PersoneriaID,
+                'DireccionID': ubigeo,
+                'PaisID': '204.00000',
+                'UbicacionID': '010101',
+                'ViaID': '135.00000',
+
+                'NombreVia': '',
+                'NumeroVia': '',
+                'InteriorVia': '',
+                'ZonaID': '136.00000',
+                'NombreZona': '',
+
+                'Direccion': direccion,
+                'Telefonos': '',
+                'Email': '',
+                'ZonaRutaID': '180.00000',
+                'Secuencia': 1,
+
+                'Coordenada': '',
+                'Estado': 1,
+                'UsuarioID': 1
+            }
+
+            db.execute(query, params)
+
+            #-------------------------------------------------
+            query = """
+                SELECT [DireccionID], [Direccion]
+                FROM [dbo].[PersoneriaDireccion] 
+                WHERE PersoneriaID =  %s
+            """
+            data = db.query(query,(PersoneriaID,))
+            #------------------------------------------------
+            if data:
+                return {"success": True, "data": data, "PersoneriaID": PersoneriaID}
+            else:
+                return {"success": False, "error": "No se devolvió el ID del nuevo registro"}
+
         except Exception as error:
-            print(error)
-            return { "success": False, "error": str(error) }
+            print("Error en create_ruc:", error)
+            return {"success": False, "error": str(error)}
 
     @staticmethod
     def create_dni(razon_social, numero_doc):

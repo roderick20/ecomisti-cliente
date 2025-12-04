@@ -109,7 +109,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-6">
+<div class="col-6">
                         <div class="mb-2">
                             <label for="GuiaTransportista" class="form-label">Generador RUC</label>
                             <div class="input-group mb-3">
@@ -120,15 +120,40 @@
                             </div>
                         </div>
                         <input id="ClienteId"  name="ClienteId" class="form-control form-control-sm" type="hidden"/>
+                        
+
+
+                    </div>
+                    <div class="col-6">
                         <div class="mb-2">
                             <label class="form-label" for="Tipo">Generador<span class="text-danger">*</span></label>
                             <input class="form-control form-control-sm" type="text" id="generador_name" />
                         </div>
+                        
+
+                        
+
+
+                    </div>
+
+                    <div class="col-12">
                         <div class="mb-2">
                             <label class="form-label" for="FuenteGeneracion">Fuente Generación</label>
-                            <input class="form-control form-control-sm" type="text" />
+                            <div class="input-group mb-3">
+                                <select  class="form-control form-control-sm" id="direccion" name="direccion"></select>
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary btn-sm"   ><i class="fa-solid fa-plus"></i> Agregar</button>
+                                </div>
+                            </div>
+                            
                         </div>
 
+                       
+
+                    </div>
+
+
+                    <div class="col-6">
                         <div class="mb-2">
                             <label for="GuiaRemision" class="form-label">Guía de Remisión</label>
                             <input id="GuiaRemision" class="form-control form-control-sm ">
@@ -137,7 +162,10 @@
                             <label for="GuiaTransportista" class="form-label">Guía del Transportista</label>
                             <input id="GuiaTransportista" class="form-control form-control-sm">
                         </div>
-
+<div class="mb-2">
+                            <label class="form-label" for="Codigo">Código de Basilea</label>
+                            <input type="text" class="form-control form-control-sm" id="Codigo" autocomplete="off" />
+                        </div>
 
                     </div>
                     <div class="col-6">
@@ -150,10 +178,7 @@
                             <input type="text" class="form-control form-control-sm" id="Volumen" autocomplete="off" />
                         </div>
 
-                        <div class="mb-2">
-                            <label class="form-label" for="Codigo">Código de Basilea</label>
-                            <input type="text" class="form-control form-control-sm" id="Codigo" autocomplete="off" />
-                        </div>
+                        
 
 
 
@@ -296,6 +321,14 @@
                 //if ($("#serie_id option:selected").text().trim().startsWith("Factura")) {
                 $("#generador_name").val(data.razon_social);
                 $("#ClienteId").val(data.personeria_id);
+
+                const select = document.getElementById('direccion');
+                data.direcciones.forEach(([id, direccion]) => {
+                    const option = document.createElement('option');
+                    option.value = id; // El ID (primer elemento)
+                    option.textContent = direccion.trim(); // La dirección (segundo elemento)
+                    select.appendChild(option);
+                    });
 
             } else {
                 // Manejar respuesta con error (ej: 404, DNI no encontrado)
