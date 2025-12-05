@@ -21,10 +21,31 @@ class OrdenModel:
     
     @staticmethod
     def get_ordenservice_by_uniqueid(uniqueid):
-        query = '''SELECT ordser.*, per.* FROM [dbo].[OrdenServicio] ordser
+        query = '''
+SELECT  
+    ordser.UniqueId, 
+    ordser.GuiaRemision,
+    ordser.GuiaTransportista,
+    ordser.Codigo,
+    ordser.Descripcion,
+    ordser.Peso,
+    ordser.Volumen, 
+    per.Personeria,
+    (SELECT TOP 1 Direccion 
+     FROM [dbo].[PersoneriaDireccion] AS perdir 
+     WHERE per.PersoneriaID = perdir.PersoneriaID AND ordser.ClienteDireccionId = perdir.DireccionID
+     ORDER BY perdir.DireccionID) AS Direccion
+FROM [dbo].[OrdenServicio] ordser
 LEFT JOIN [dbo].[Orden] ord ON ord.Id = ordser.OrdenId
 LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
-                WHERE ord.uniqueid = %s'''
+WHERE ord.uniqueid = %s
+ORDER BY ordser.Created;
+
+
+        
+        
+        
+        '''
         data_result =  db.query(query,(uniqueid,))
         data_dict = [row._asdict() for row in data_result] if data_result else []
         return data_dict
@@ -35,6 +56,20 @@ LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
         data_result =  db.query(query)
         data_dict = [row._asdict() for row in data_result] if data_result else []
         return data_dict
+    
+    @staticmethod
+    def servicio_delete(servicioUniqueId):
+        try :
+            query = '''
+                DELETE FROM [dbo].[OrdenServicio] WHERE UniqueID = %s;
+            '''
+            data = db.execute(query, ( servicioUniqueId,  ))
+            print(data)
+            return { "success": True, "data": data }
+        except Exception as error:
+            print(error)
+            return { "success": False, "error": str(error) }
+    
     
     @staticmethod
     def searchPersoneria(search):
@@ -121,6 +156,7 @@ LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
             'Author' : user_id,
             'OrdenId': result[0].Id,
             'ClienteId':  form_data.get('ClienteId', '').strip(),
+            'ClienteDireccionId':  form_data.get('Direccion', '').strip(),
             }
 
 
@@ -129,12 +165,12 @@ LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
                 (GuiaRemision, 
                 GuiaTransportista, Peso, Volumen, 
                 Codigo,  
-                Descripcion, OrdenId, Author, ClienteId)
+                Descripcion, OrdenId, Author, ClienteId, ClienteDireccionId)
                 VALUES 
                 (%(GuiaRemision)s, 
                 %(GuiaTransportista)s, %(Peso)s, %(Volumen)s, 
                 %(Codigo)s,
-                %(Descripcion)s, %(OrdenId)s, %(Author)s, %(ClienteId)s);
+                %(Descripcion)s, %(OrdenId)s, %(Author)s, %(ClienteId)s, %(ClienteDireccionId)s);
             '''
             data = db.execute(query, ( values ))
             print(data)
@@ -143,6 +179,75 @@ LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
             print(error)
             return { "success": False, "error": str(error) }
         
+    @staticmethod
+    def addDireccion(form_data):
+        print('addDireccion')
+        try:
+
+            query = """
+                SELECT max([DireccionID]) siguiente FROM [db_a9d155_ecomisti].[dbo].[PersoneriaDireccion] WHERE PersoneriaID =  %s
+            """
+            data = db.query(query,(form_data.get('PersoneriaID', '').strip(),))
+
+            siguiente = data[0].siguiente + 1
+
+            query = """
+                INSERT INTO [dbo].[PersoneriaDireccion] (
+                    [PersoneriaID],[DireccionID],[PaisID],[UbicacionID],[ViaID]
+                    ,[NombreVia],[NumeroVia],[InteriorVia],[ZonaID],[NombreZona]
+                    ,[Direccion],[Telefonos],[Email],[ZonaRutaID],[Secuencia]
+                    ,[Coordenada],[Estado],[UsuarioID]
+                )                
+                VALUES (
+                    %(PersoneriaID)s,%(DireccionID)s,%(PaisID)s,%(UbicacionID)s,%(ViaID)s
+                    ,%(NombreVia)s,%(NumeroVia)s,%(InteriorVia)s,%(ZonaID)s,%(NombreZona)s
+                    ,%(Direccion)s,%(Telefonos)s,%(Email)s,%(ZonaRutaID)s,%(Secuencia)s
+                    ,%(Coordenada)s,%(Estado)s,%(UsuarioID)s
+                );
+            """
+            params = {
+                'PersoneriaID': form_data.get('PersoneriaID', '').strip(),
+                'DireccionID': siguiente,
+                'PaisID': '204.00000',
+                'UbicacionID': form_data.get('Ubigeo', '').strip(),
+                'ViaID': '135.00000',
+
+                'NombreVia': '',
+                'NumeroVia': '',
+                'InteriorVia': '',
+                'ZonaID': '136.00000',
+                'NombreZona': '',
+
+                'Direccion': form_data.get('Direccion', '').strip(),
+                'Telefonos': '',
+                'Email': '',
+                'ZonaRutaID': '180.00000',
+                'Secuencia': 1,
+
+                'Coordenada': '',
+                'Estado': 1,
+                'UsuarioID': 1
+            }
+
+            db.execute(query, params)
+
+            #-------------------------------------------------
+            query = """
+                SELECT [DireccionID], [Direccion]
+                FROM [dbo].[PersoneriaDireccion] 
+                WHERE PersoneriaID =  %s
+            """
+            data = db.query(query,(form_data.get('PersoneriaID', '').strip(),))
+            #------------------------------------------------
+            if data:
+                return {"success": True, "data": data}
+            else:
+                return {"success": False, "error": "No se devolvió el ID del nuevo registro"}
+
+        except Exception as error:
+            print("Error en create_ruc:", error)
+            return {"success": False, "error": str(error)}
+
 
     @staticmethod
     def get_table(request):
@@ -251,28 +356,46 @@ LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
         except Exception as error:
             return { "success": False, "error": str(error) }   
         
+    @staticmethod
+    def get_ubicacion():
+        try:
+            query = """
+                SELECT [UbicacionID],[Ubicacion] FROM [dbo].[UbicacionGeografica]
+            """
+            data = db.query(query)
 
-    # @staticmethod
-    # def create_ruc(razon_social, numero_doc, direccion, ubigeo):
-    #     print('create_ruc')
-    #     try:
-    #         creado_por = session['user_id']            
-    #         query = """
-    #             INSERT INTO personeria
-    #                 (Personeria, NombreComercial, TipoIdentidadID, NroIdentidad, GrupoPersoneria, Domiciliado,TipoContribuyente,FamiliaID,NegocioID,CtaDetraccion,
-    #                 Codigo,Estado,UsuarioID,ConvenioID,MedioRegistroID,MedioInformacionID,Referencia,Telefonos,email)
-    #             VALUES( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
-    #                     %s, %s, %s, %s, %s, %s, %s, %s, %s)  
-    #         """
-    #         data = db.execute(query, ( 
-    #             razon_social, razon_social, '203.00002', numero_doc, '101000', 1, 0,'143.00000','179.00000','',
-    #             '',1,1,'902.00001','900.00001','901.00002','','',''))
-    #         print(data)
-    #         return { "success": True, "data": data }
-    #     except Exception as error:
-    #         print(error)
-    #         return { "success": False, "error": str(error) }
+            ubicaciones = [{"id": row.UbicacionID.strip(), "nombre": row.Ubicacion.strip()} for row in data]
 
+            # Agrupar en Python
+            departamentos = []
+            provincias = {}
+            distritos = {}
+
+            for u in ubicaciones:
+                codigo = u["id"]
+                if len(codigo) == 2:
+                    departamentos.append(u)
+                elif len(codigo) == 4:
+                    dep_id = codigo[:2]
+                    provincias.setdefault(dep_id, []).append(u)
+                elif len(codigo) == 6:
+                    prov_id = codigo[:4]
+                    distritos.setdefault(prov_id, []).append(u)
+
+            # Preparar estructura para pasar a la plantilla
+            datos_ubicacion = {
+                "departamentos": departamentos,
+                "provincias": provincias,
+                "distritos": distritos
+            }
+
+
+
+
+            return { "success": True, "data": datos_ubicacion }
+        except Exception as error:
+            return { "success": False, "error": str(error) }   
+        
     @staticmethod
     def create_ruc(razon_social, numero_doc, direccion, ubigeo):
         print('create_ruc')
@@ -344,9 +467,9 @@ LEFT JOIN [dbo].[Personeria] per ON ordser.ClienteId = per.PersoneriaID
             PersoneriaID = data[0].PersoneriaID
             params = {
                 'PersoneriaID': PersoneriaID,
-                'DireccionID': ubigeo,
+                'DireccionID': 1,
                 'PaisID': '204.00000',
-                'UbicacionID': '010101',
+                'UbicacionID': ubigeo,
                 'ViaID': '135.00000',
 
                 'NombreVia': '',

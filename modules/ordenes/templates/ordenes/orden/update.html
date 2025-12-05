@@ -74,10 +74,11 @@
                     <button type="button" class="btn btn-primary float-end mb-2" onclick="openDialogAdd()">
                         <i class="fa-solid fa-plus"></i> Agregar
                     </button>
-                    
+
                     <table id="tblData" class="table table-sm  table-bordered " style="width: 100%">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>Item</th>
                                 <th>Guía de Remisión</th>
                                 <th>Guía de Transportista</th>
@@ -109,18 +110,18 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-<div class="col-6">
+                    <div class="col-6">
                         <div class="mb-2">
                             <label for="GuiaTransportista" class="form-label">Generador RUC</label>
                             <div class="input-group mb-3">
                                 <input class="form-control form-control-sm" id="numero_doc" type="text" />
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary btn-sm"  onclick="buscarPersona()" ><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                                    <button class="btn btn-primary btn-sm" onclick="buscarPersona()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
-                        <input id="ClienteId"  name="ClienteId" class="form-control form-control-sm" type="hidden"/>
-                        
+                        <input id="ClienteId" name="ClienteId" class="form-control form-control-sm" type="hidden" />
+
 
 
                     </div>
@@ -129,9 +130,9 @@
                             <label class="form-label" for="Tipo">Generador<span class="text-danger">*</span></label>
                             <input class="form-control form-control-sm" type="text" id="generador_name" />
                         </div>
-                        
 
-                        
+
+
 
 
                     </div>
@@ -140,15 +141,15 @@
                         <div class="mb-2">
                             <label class="form-label" for="FuenteGeneracion">Fuente Generación</label>
                             <div class="input-group mb-3">
-                                <select  class="form-control form-control-sm" id="direccion" name="direccion"></select>
+                                <select class="form-control form-control-sm" id="direccion" name="direccion"></select>
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary btn-sm"   ><i class="fa-solid fa-plus"></i> Agregar</button>
+                                    <button class="btn btn-primary btn-sm" onclick="openDireccion()"><i class="fa-solid fa-plus"></i> Agregar</button>
                                 </div>
                             </div>
-                            
+
                         </div>
 
-                       
+
 
                     </div>
 
@@ -162,7 +163,7 @@
                             <label for="GuiaTransportista" class="form-label">Guía del Transportista</label>
                             <input id="GuiaTransportista" class="form-control form-control-sm">
                         </div>
-<div class="mb-2">
+                        <div class="mb-2">
                             <label class="form-label" for="Codigo">Código de Basilea</label>
                             <input type="text" class="form-control form-control-sm" id="Codigo" autocomplete="off" />
                         </div>
@@ -178,7 +179,7 @@
                             <input type="text" class="form-control form-control-sm" id="Volumen" autocomplete="off" />
                         </div>
 
-                        
+
 
 
 
@@ -199,15 +200,174 @@
 </div>
 
 
+<div class="modal fade" id="ubicacionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Seleccionar Dirección</h5>
+                {# <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> #}
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Departamento</label>
+                    <select id="selectDepartamento" class="form-control form-control-sm">
+                        <option value="">Seleccione...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Provincia</label>
+                    <select id="selectProvincia" class="form-control form-control-sm" disabled>
+                        <option value="">Seleccione...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Distrito</label>
+                    <select id="selectDistrito" class="form-control form-control-sm" disabled>
+                        <option value="">Seleccione...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Dirección</label>
+                    <input id="modalDireccion" class="form-control form-control-sm" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"  data-dismiss="modal" onclick="$('#formModal').modal('hide')">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="agregarDireccion" onclick="agregarDireccion()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 {% block scripts %}
 
 
 <script>
 
+    let dataUbicaciones = {{ ubicaciones| tojson }};
+
+    function openDireccion() {
+        $('#modalDireccion').val('')
+
+        $('#ubicacionModal').modal('show');
+    }
+
+
+
+    $(document).ready(function () {
+        const depto = $('#selectDepartamento');
+        const prov = $('#selectProvincia');
+        const dist = $('#selectDistrito');
+
+        // Llenar departamentos
+        dataUbicaciones.departamentos.forEach(d => {
+            depto.append(`<option value="${d.id}">${d.nombre}</option>`);
+        });
+
+        // Al cambiar departamento
+        depto.change(function () {
+            const deptoId = $(this).val();
+            prov.empty().append('<option value="">Seleccione...</option>').prop('disabled', true);
+            dist.empty().append('<option value="">Seleccione...</option>').prop('disabled', true);
+
+            if (deptoId && dataUbicaciones.provincias[deptoId]) {
+                dataUbicaciones.provincias[deptoId].forEach(p => {
+                    prov.append(`<option value="${p.id}">${p.nombre}</option>`);
+                });
+                prov.prop('disabled', false);
+            }
+        });
+
+        // Al cambiar provincia
+        prov.change(function () {
+            const provId = $(this).val();
+            dist.empty().append('<option value="">Seleccione...</option>').prop('disabled', true);
+
+            if (provId && dataUbicaciones.distritos[provId]) {
+                dataUbicaciones.distritos[provId].forEach(d => {
+                    dist.append(`<option value="${d.id}">${d.nombre}</option>`);
+                });
+                dist.prop('disabled', false);
+            }
+        });
+        /*
+          // Confirmar
+          $('#btnConfirmar').click(function() {
+            const distId = $dist.val();
+            if (distId) {
+              const depto = $depto.find('option:selected').text();
+              const prov = $prov.find('option:selected').text();
+              const dist = $dist.find('option:selected').text();
+              alert(`Ubicación seleccionada:\n${dist}, ${prov}, ${depto}\nID: ${distId}`);
+              // Aquí puedes usar distId para enviar a tu backend si lo necesitas
+            } else {
+              alert('Por favor selecciona un distrito.');
+            }
+          }); */
+    });
 
     function openDialogAdd() {
         $('#formModal').modal('show');
+
+        $('#numero_doc').val('')
+        $('#generador_name').val('')
+        $('#direccion').html('')
+        $('#GuiaRemision').val('')
+        $('#GuiaTransportista').val('')
+        $('#Codigo').val('')
+        $('#Peso').val('')
+        $('#Volumen').val('')
+        $('#Descripcion').val('')
+    }
+
+    function agregarDireccion() {
+        if ($('#selectDistrito').val() == "") {
+            alert('Seleccione distrito');
+            return;
+        }
+        if ($('#modalDireccion').val() == "") {
+            alert('Ingrese Dirección');
+            return;
+        }
+        if ($('#ClienteId').val() == "") {
+            alert('Seleccione Generador');
+            return;
+        }
+        $('#agregarDireccion').html('<i class="fas fa-spinner fa-spin"></i>');
+
+        var entity = {
+            Ubigeo: $('#selectDistrito').val() || "",
+            Direccion: $('#modalDireccion').val() || "",
+            PersoneriaID: $('#ClienteId').val() || "",
+        };
+
+        $.ajax({
+            url: '/ordenes/adddireccion',
+            type: 'POST',
+            data: entity,
+            success: async function (result) {
+
+                $('#agregarDireccion').html('<i class="fa-solid fa-cloud-arrow-up"></i> Grabar');
+                $('#ubicacionModal').modal('hide');
+
+                let select = document.getElementById('direccion');
+                select.innerHTML = "";
+                result.data.forEach(([id, direccion]) => {
+                    const option = document.createElement('option');
+                    option.value = id; // El ID (primer elemento)
+                    option.textContent = direccion.trim(); // La dirección (segundo elemento)
+                    select.appendChild(option);
+                });
+
+            },
+            error: function (xhr, status, error) {
+                alert('Error al guardar: ' + error);
+            }
+        });
     }
 
     details();
@@ -226,7 +386,10 @@
                 let td = "<td></td>";
 
                 $("#tblData tbody").append(`<tr>
-                    <td>${i+1}</td>
+
+                    <td><a class="btn btn-sm btn-danger" title="Eliminar" href="/ordenes/delete/{{order.UniqueId}}/${servicio.UniqueId}"><i class="fa-solid fa-trash"></i></a></td> 
+
+                    <td>${i + 1}</td>
                     <td>${servicio.GuiaRemision}</td>
                     <td>${servicio.GuiaTransportista}</td>
                     <td>${servicio.Personeria}</td>
@@ -258,6 +421,7 @@
             Codigo: $('#Codigo').val() || "",
             Descripcion: $('#Descripcion').val() || "",
             ClienteId: $('#ClienteId').val() || "",
+            Direccion: $('#direccion').val() || "",
         };
 
         $.ajax({
@@ -294,7 +458,7 @@
         icon.className = 'fa-solid fa-spinner fa-spin';
     });
 
-  
+
     async function buscarPersona() {
         //const tipoDoc = document.getElementById("tipo_doc").value;
         const numeroDoc = document.getElementById("numero_doc").value.trim();
@@ -312,7 +476,7 @@
         boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> '; // o usa un spinner si tienes
 
         let url = `/ordenes/search_ruc/${numeroDoc}`;
-       
+
         try {
             const response = await fetch(url);
             const data = await response.json();
@@ -328,7 +492,7 @@
                     option.value = id; // El ID (primer elemento)
                     option.textContent = direccion.trim(); // La dirección (segundo elemento)
                     select.appendChild(option);
-                    });
+                });
 
             } else {
                 // Manejar respuesta con error (ej: 404, DNI no encontrado)

@@ -20,15 +20,6 @@ def orden_get_table():
         except Exception as error:
             print(error)
 
-# @bp.route('/getplacas', methods=['POST'])
-# def orden_get_placas():
-#     print(request)
-#     if request.method == 'POST':
-#         try:
-#             result = OrdenModel.get_placa_personeria_id(request.form)
-#             return jsonify(result)             
-#         except Exception as error:
-#             print(error)
 @bp.route('/getordenservices/<string:uniqueid>', methods=['GET'])
 def orden_getordenservices(uniqueid):   
     try:
@@ -41,6 +32,16 @@ def orden_getordenservices(uniqueid):
 def orden_addservice():
     try:
         result = OrdenModel.addservice(request.form)
+
+        return jsonify(result)             
+    except Exception as error:
+        print(error)
+
+@bp.route('/adddireccion', methods=['POST'])
+def orden_adddireccion():
+    try:
+        result = OrdenModel.addDireccion(request.form)
+
         return jsonify(result)             
     except Exception as error:
         print(error)
@@ -54,7 +55,12 @@ def orden_get_direcciones():
     except Exception as error:
         print(error)
 
-@bp.route('/create', methods=['GET', 'POST'])
+@bp.route('/delete/<string:ordenUniqueId>/<string:servicioUniqueId>', methods=['GET'])
+def orden_delete(ordenUniqueId,servicioUniqueId):  
+    OrdenModel.servicio_delete(servicioUniqueId)
+    return redirect(url_for('orden.orden_update', uniqueid=ordenUniqueId))
+
+@bp.route('/remove', methods=['GET', 'POST'])
 def orden_create():  
     if request.method == 'POST':  
         result = OrdenModel.create(request.form)
@@ -65,7 +71,8 @@ def orden_create():
 @bp.route('/update/<string:uniqueid>', methods=['GET', 'POST'])
 def orden_update(uniqueid):  
     result = OrdenModel.get_orden_by_uniqueid(uniqueid)
-    return render_template('/ordenes/orden/update.html', order = result)
+    ubicaciones = OrdenModel.get_ubicacion()
+    return render_template('/ordenes/orden/update.html', order = result, ubicaciones = ubicaciones['data'])
 
 @bp.route('/searchclient')
 def search_client():
