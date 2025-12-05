@@ -60,7 +60,7 @@ def orden_delete(ordenUniqueId,servicioUniqueId):
     OrdenModel.servicio_delete(servicioUniqueId)
     return redirect(url_for('orden.orden_update', uniqueid=ordenUniqueId))
 
-@bp.route('/remove', methods=['GET', 'POST'])
+@bp.route('/create', methods=['GET', 'POST'])
 def orden_create():  
     if request.method == 'POST':  
         result = OrdenModel.create(request.form)
